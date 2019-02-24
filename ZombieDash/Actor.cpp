@@ -58,10 +58,136 @@ bool Actor::checkOverlap(Actor* other, int A, int C)
 }
 
 
-//MARK: Penelope
-//Pass size here?
+
+//Mark: Wall
+
+Wall::Wall(StudentWorld* gw, double startX, double startY)
+:Actor(gw,IID_WALL, startX, startY, right, 0)
+{}
+
+void Wall::doSomething(){};
+    
+//Does nothing. Overriden to prevent accidental call
+void Wall::setDead(){};
+
+
+
+//##########################
+// MARK: - Activating Objects
+//##########################
+
+
+
+ActivatingObject::ActivatingObject(StudentWorld* gw, int id, double startX, double startY, Direction dir, int depth)
+:Actor(gw, id, startX, startY, dir, depth)
+{
+    
+    
+}
+
+Exit::Exit(StudentWorld* gw, double startX, double startY)
+:ActivatingObject(gw, IID_EXIT, startX, startY, right, 1)
+{
+    
+    
+}
+
+Pit::Pit(StudentWorld* gw, double startX, double startY)
+:ActivatingObject(gw, IID_PIT, startX, startY, right, 0)
+{
+    
+    
+}
+
+Flame::Flame(StudentWorld* gw, double startX, double startY, Direction dir)
+:ActivatingObject(gw, IID_FLAME, startX, startY, dir, 0)
+{
+    
+    
+}
+
+Vomit::Vomit(StudentWorld* gw, double startX, double startY, Direction dir)
+:ActivatingObject(gw, IID_VOMIT, startX, startY, dir, 0)
+{
+    
+    
+}
+
+Landmine::Landmine(StudentWorld* gw, double startX, double startY)
+:ActivatingObject(gw, IID_LANDMINE, startX, startY, right, 1)
+{
+    
+    
+}
+
+
+
+
+
+
+
+//##########################
+// MARK: - Goodies
+//##########################
+
+Goodie::Goodie(StudentWorld* gw, int imageID, double startX, double startY)
+:ActivatingObject(gw, imageID, startX, startY, right, 1)
+{
+    
+    
+}
+
+VaccineGoodie::VaccineGoodie(StudentWorld* gw, double startX, double startY)
+:Goodie(gw, IID_VACCINE_GOODIE, startX, startY)
+{
+    
+    
+}
+
+GasCanGoodie::GasCanGoodie(StudentWorld* gw, double startX, double startY)
+:Goodie(gw, IID_GAS_CAN_GOODIE, startX, startY)
+{
+    
+    
+}
+
+LandmineGoodie::LandmineGoodie(StudentWorld* gw, double startX, double startY)
+:Goodie(gw, IID_LANDMINE_GOODIE, startX, startY)
+{
+    
+    
+}
+
+
+//##########################
+// MARK: - Agent
+//##########################
+
+Agent::Agent(StudentWorld* gw, int imageID, double startX, double startY)
+:Actor(gw, imageID, startX, startY, right, 0)
+{
+    
+    
+}
+
+//*************
+// MARK: Human
+Human::Human(StudentWorld* gw, int imageID, double startX, double startY)
+:Agent(gw, imageID, startX, startY)
+{
+    
+    
+}
+
+Citizen::Citizen(StudentWorld* gw, double startX, double startY)
+:Human(gw, IID_CITIZEN, startX, startY)
+{
+    
+    
+}
+
 Penelope::Penelope(StudentWorld* gw, double startX, double startY)
-:Human(gw,IID_PLAYER, startX, startY, right, 0),
+:Human(gw,IID_PLAYER, startX, startY),
 flamethower_count(0),mine_count(0),vaccine_count(0),infectedStatus(false),infectionCount(0)
 {}
 
@@ -97,54 +223,33 @@ void Penelope::doSomething()
                 moveRight();
                 break;
                 
-            
+                
                 
         }
     }
 }
 
 
-//Mark: Wall
 
-Wall::Wall(StudentWorld* gw, double startX, double startY)
-:Actor(gw,IID_WALL, startX, startY, right, 0)
-{}
-
-void Wall::doSomething(){};
-    
-//Does nothing. Overriden to prevent accidental call
-void Wall::setDead(){};
-
-//##########################
-// MARK: - Activating Objects
-//##########################
-ActivatingObject::ActivatingObject(StudentWorld* gw, int id, int startX, int startY, Direction dir, int depth)
-:Actor(gw, id, startX, startY, Direction dir, int depth)
-{
-    
-    
-}
-//##########################
-// MARK: - Goodies
-//##########################
-
-Goodie::Goodie(StudentWorld* gw, int imageID, double startX, double startY, Direction dir)
-:ActivatingObject(gw, imageID, startX, startY, dir, 1)
+//*************
+// MARK: Zombie
+Zombie::Zombie(StudentWorld* gw, double startX, double startY)
+:Agent(gw, IID_ZOMBIE, startX, startY)
 {
     
     
 }
 
-
-//##########################
-// MARK: - Agent
-//##########################
-
-Agent::Agent(StudentWorld* gw, int imageID, double startX, double startY)
-:Actor(gw, imageID, startX, startY, right, 0)
+DumbZombie::DumbZombie(StudentWorld* gw, double startX, double startY)
+:Zombie(gw, startX, startY)
 {
     
     
 }
 
-// MARK: Human
+SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)
+:Zombie(gw, startX, startY)
+{
+    
+    
+}

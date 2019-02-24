@@ -68,49 +68,49 @@ int StudentWorld::init()
                     }break;
                     
                     case Level::citizen:{
-                        Actor* actor = new Citizen(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new Citizen(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
                     
                     case Level::pit:{
-                        Actor* actor = new Pit(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new Pit(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
                         
                     case Level::vaccine_goodie:{
-                        Actor* actor = new VaccineGoodie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new VaccineGoodie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
                         
                     case Level::gas_can_goodie:{
-                        Actor* actor = new GasCanGoodie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new GasCanGoodie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
                         
                     case Level::landmine_goodie:{
-                        Actor* actor = new LandmineGoodie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new LandmineGoodie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
                         
                     case Level::exit:{
-                        Actor* actor = new Exit(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new Exit(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
                         
                     case Level::dumb_zombie:{
-                        Actor* actor = new DumbZombie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new DumbZombie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
                         
                     case Level::smart_zombie:{
-                        Actor* actor = new SmartZombie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT)
+                        Actor* actor = new SmartZombie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
                         
                     }break;
