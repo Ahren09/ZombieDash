@@ -87,9 +87,24 @@ ActivatingObject::ActivatingObject(StudentWorld* gw, int id, double startX, doub
 
 Exit::Exit(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_EXIT, startX, startY, right, 1)
+{}
+
+void Exit::doSomething()
 {
+    //TODO: get info about a citizen's successful escape
+    if(/* */)
+    {
+        getWorld()->increaseScore(500);
+        
+        getWorld()->playSound(SOUND_CITIZEN_SAVED);
+    }
     
-    
+    //TODO: all citizen saved and penelope escape
+    if(getWorld()->getCitizenCount()==0 && )
+    {
+        getWorld()
+        
+    }
 }
 
 Pit::Pit(StudentWorld* gw, double startX, double startY)
@@ -226,6 +241,16 @@ void Penelope::doSomething()
                 
                 
         }
+    }
+}
+
+void Penelope::useVaccine()
+{
+    if(vaccine_count>0)
+    {
+        vaccine_count--;
+        infectedStatus=false;
+        infectionCount=0;
     }
 }
 

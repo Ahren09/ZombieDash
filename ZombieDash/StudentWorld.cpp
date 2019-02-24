@@ -148,14 +148,14 @@ int StudentWorld::move()
             return GWSTATUS_PLAYER_DIED;
         }
         
-        /*
-         //if citi / Pene escape
-         if(citizen_count==0 && pene->getX()== && pene->getY()==)
+        
+         //if citizen Penelope has escaped
+         if(gameFinished)
          {
-         playSound(SOUND_LEVEL_FINISHED);
-         return GWSTATUS_FINISHED_LEVEL;
+             playSound(SOUND_LEVEL_FINISHED);
+             return GWSTATUS_FINISHED_LEVEL;
          }
-         */
+        
     }
     for(list<Actor*>::iterator it=m_actors.begin(); it!=m_actors.end(); it++)
     {

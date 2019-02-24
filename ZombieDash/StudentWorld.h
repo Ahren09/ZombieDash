@@ -20,12 +20,21 @@ public:
     virtual int move();
     virtual void cleanUp();
     bool checkAllOverlap(Actor* a, int X, int Y);
+    bool setGameFinished()
+    {
+        gameFinished=true;
+    }
+    int getCitizenCount() const
+    {
+        return citizen_count;
+    }
 
 private:
     std::list<Actor*> m_actors;
     int citizen_count;
     Penelope* pene;
     
+    bool gameFinished;
     
     
 };

@@ -72,7 +72,7 @@ class ActivatingObject: public Actor
 public:
     ActivatingObject(StudentWorld* gw, int id, double startX, double startY, Direction dir = 0, int depth = 0);
     virtual ~ActivatingObject();
-    
+    virtual void doSomething();
 };
 
 class Exit: public ActivatingObject
@@ -80,6 +80,7 @@ class Exit: public ActivatingObject
 public:
     Exit(StudentWorld* gw, double startX, double startY);
     ~Exit();
+    void doSomething();
     
 };
 
@@ -173,12 +174,19 @@ public:
     virtual ~Human();
 };
 
+
+
 class Penelope: public Human
 {
 public:
     Penelope(StudentWorld* gw, double startX, double startY);
     ~Penelope();
     virtual void doSomething();
+    void fire(Direction dir); //Fire flame
+    
+    
+    void addMine();
+    void useVaccine();
     
 private:
     int flamethower_count;
@@ -188,6 +196,8 @@ private:
     bool infectedStatus;
     
 };
+
+
 
 class Citizen: public Human
 {
