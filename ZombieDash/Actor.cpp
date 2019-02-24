@@ -1,6 +1,8 @@
 #include "Actor.h"
 #include "StudentWorld.h"
 #include "GameWorld.h"
+#include <cmath>
+#include <vector>
 
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 Actor::Actor(StudentWorld* gw, int imageID, double startX, double startY,
@@ -51,10 +53,20 @@ bool Actor::checkOverlap(Actor* other, int A, int C)
     int B=A+SPRITE_WIDTH-1, D=C+SPRITE_HEIGHT-1;
     int A_=other->getX(), B_=other->getX()+SPRITE_WIDTH-1, C_=other->getY(), D_=other->getY()+SPRITE_HEIGHT-1;
     
+    
     return ((A <= A_ && A_ <= B && C <= C_ && C_ < D) ||
             (A <= B_ && B_ <= B && C <= C_ && C_ < D) ||
             (A <= A_ && A_ <= B && C <= D_ && D_ < D) ||
             (A <= B_ && B_ <= B && C <= D_ && D_ < D));
+}
+
+//Returns true if Euclidean distance is less than 10
+bool Actor::checkOverlapAnother(Actor *other)
+{
+    int d_x=abs(getX()-other->getX());
+    int d_y=abs(getY()-other->getY());
+    
+    return d_x * d_x + d_y * d_y <=100;
 }
 
 
@@ -66,9 +78,6 @@ Wall::Wall(StudentWorld* gw, double startX, double startY)
 {}
 
 void Wall::doSomething(){};
-    
-//Does nothing. Overriden to prevent accidental call
-void Wall::setDead(){};
 
 
 
@@ -100,18 +109,27 @@ void Exit::doSomething()
     }
     
     //TODO: all citizen saved and penelope escape
-    if(getWorld()->getCitizenCount()==0 && )
+    if(getWorld()->getCitizenCount()==0 && checkOverlapAnother(getWorld()->getPenelope()) )
     {
-        getWorld()
+        getWorld()->
         
     }
 }
 
 Pit::Pit(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_PIT, startX, startY, right, 0)
+{}
+
+void Pit::doSomething()
 {
+    for(vector<Actor*>::iterator it=)
     
-    
+}
+
+
+void Pit::kill()
+{
+    if(checkOverlapAnother(<#Actor *other#>))
 }
 
 Flame::Flame(StudentWorld* gw, double startX, double startY, Direction dir)
@@ -147,9 +165,17 @@ Landmine::Landmine(StudentWorld* gw, double startX, double startY)
 
 Goodie::Goodie(StudentWorld* gw, int imageID, double startX, double startY)
 :ActivatingObject(gw, imageID, startX, startY, right, 1)
+{}
+
+void VaccineGoodie::doSomething()
 {
-    
-    
+    if(checkOverlapAnother(getWorld()->getPenelope()))
+    {
+        setDead();
+        getWorld()->playSound(SOUND_GOT_GOODIE);
+        getWorld()->getPenelope()->increaseVaccines();
+        
+    }
 }
 
 VaccineGoodie::VaccineGoodie(StudentWorld* gw, double startX, double startY)
@@ -188,10 +214,18 @@ Agent::Agent(StudentWorld* gw, int imageID, double startX, double startY)
 //*************
 // MARK: Human
 Human::Human(StudentWorld* gw, int imageID, double startX, double startY)
-:Agent(gw, imageID, startX, startY)
+:Agent(gw, imageID, startX, startY),
+infectedStatus(false),infectionCount(0)
+{}
+
+void Human::doSomething()
 {
-    
-    
+    if(getInfectedStatus())
+    {
+        infectionCount++;
+        if(getInfectionCount()>=500)
+            setDead();
+    }
 }
 
 Citizen::Citizen(StudentWorld* gw, double startX, double startY)
@@ -203,18 +237,15 @@ Citizen::Citizen(StudentWorld* gw, double startX, double startY)
 
 Penelope::Penelope(StudentWorld* gw, double startX, double startY)
 :Human(gw,IID_PLAYER, startX, startY),
-flamethower_count(0),mine_count(0),vaccine_count(0),infectedStatus(false),infectionCount(0)
+flame_count(0),mine_count(0),vaccine_count(0)
 {}
 
 void Penelope::doSomething()
 {
     //If infection Count reach the threshold
-    if(infectionCount >= 500)
-    {
-        setDead();
-        getWorld()->playSound(SOUND_PLAYER_DIE);
-        return;
-    }
+    Human::doSomething();
+
+    
     
     
     int ch;
@@ -249,11 +280,44 @@ void Penelope::useVaccine()
     if(vaccine_count>0)
     {
         vaccine_count--;
-        infectedStatus=false;
-        infectionCount=0;
+        clearInfectedStatus();
     }
 }
 
+void Penelope::useFlame()
+{
+    for(int i=1;i<=3;i++)
+    {
+        //TODO: Nothing blocks the flame
+        if()
+        {
+            
+            
+        }
+        //There exist objects blocking the flame
+        else break;
+    }
+}
+
+void Penelope::useLandmine()
+{
+    getWorld()->addActor(new Landmine(getWorld(),getX(),getY()));
+}
+
+void Citizen::setDead()
+{
+    Human::setDead();
+    getWorld()->increaseScore(-1000);
+}
+
+void Citizen::doSomething()
+{
+    Human::doSomething();
+    if(!isAlive())
+    {
+        getWorld()->playSound(SOUND_CITIZEN_);
+    }
+}
 
 
 //*************

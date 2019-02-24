@@ -20,7 +20,7 @@ public:
     virtual int move();
     virtual void cleanUp();
     bool checkAllOverlap(Actor* a, int X, int Y);
-    bool setGameFinished()
+    void setGameFinished()
     {
         gameFinished=true;
     }
@@ -28,6 +28,22 @@ public:
     {
         return citizen_count;
     }
+    Penelope* getPenelope() const
+    {
+        return pene;
+    }
+    
+    void addActor(Actor* actor)
+    {
+        m_actors.push_back(actor);
+    }
+    
+    const std::list<Actor*> &getAllActors()
+    {
+        return m_actors;
+    }
+    
+    
 
 private:
     std::list<Actor*> m_actors;

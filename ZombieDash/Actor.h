@@ -41,6 +41,7 @@ public:
     void moveRight();
     
     bool checkOverlap(Actor* other, int A, int C);
+    bool checkOverlapAnother(Actor* other);
     
 private:
     StudentWorld* m_world;
@@ -82,6 +83,7 @@ public:
     ~Exit();
     void doSomething();
     
+    
 };
 
 class Pit: public ActivatingObject
@@ -89,6 +91,8 @@ class Pit: public ActivatingObject
 public:
     Pit(StudentWorld* gw, double startX, double startY);
     ~Pit();
+    void kill();
+    void doSomething();
     
 };
 
@@ -124,6 +128,7 @@ class Goodie: public ActivatingObject
 public:
     Goodie(StudentWorld* gw, int imageID, double startX, double startY);
     virtual ~Goodie();
+    virtual void doSomething();
 };
 
 class VaccineGoodie: public Goodie
@@ -131,7 +136,7 @@ class VaccineGoodie: public Goodie
 public:
     VaccineGoodie(StudentWorld* gw, double startX, double startY);
     ~VaccineGoodie();
-    
+    void doSomething();
     
 };
 
@@ -140,7 +145,7 @@ class GasCanGoodie: public Goodie
 public:
     GasCanGoodie(StudentWorld* gw, double startX, double startY);
     ~GasCanGoodie();
-    
+    void doSomething();
 };
 
 class LandmineGoodie: public Goodie
@@ -148,7 +153,7 @@ class LandmineGoodie: public Goodie
 public:
     LandmineGoodie(StudentWorld* gw, double startX, double startY);
     ~LandmineGoodie();
-    
+    void doSomething();
 };
 
 //##########################
@@ -161,7 +166,7 @@ class Agent: public Actor
 public:
     Agent(StudentWorld* gw, int imageID, double startX, double startY);
     virtual ~Agent();
-    
+    virtual void dieByFallOrBurn()=0;
     
 };
 
@@ -172,6 +177,30 @@ class Human: public Agent
 public:
     Human(StudentWorld* gw, int imageID, double startX, double startY);
     virtual ~Human();
+    virtual void doSomething();
+    bool getInfectedStatus() const
+    {
+        return infectedStatus;
+    }
+    int getInfectionCount() const
+    {
+        return infectionCount;
+    }
+    void increaseInfectionCount()
+    {
+        infectionCount++;
+    }
+    void clearInfectedStatus()
+    {
+        infectionCount=0;
+        infectedStatus=false;
+    }
+    virtual void setDead();
+    
+private:
+    int infectionCount;
+    bool infectedStatus;
+    
 };
 
 
@@ -187,13 +216,49 @@ public:
     
     void addMine();
     void useVaccine();
+    void increaseVaccines()
+    {
+        vaccine_count++;
+    }
+    
+    // Increase the number of flame charges the object has.
+    void increaseFlameCharges()
+    {
+        flame_count++;
+    }
+    
+    // Increase the number of landmines the object has.
+    void increaseLandmines()
+    {
+        mine_count++;
+    }
+    
+    // How many vaccines does the object have?
+    int getNumVaccines() const
+    {
+        return vaccine_count;
+    }
+    
+    // How many flame charges does the object have?
+    int getNumFlameCharges() const
+    {
+        return flame_count;
+    }
+    
+    // How many landmines does the object have?
+    int getNumLandmines() const
+    {
+        return mine_count;
+    }
+    
+    void useFlame();
+    
+    void useLandmine();
     
 private:
-    int flamethower_count;
+    int flame_count;
     int mine_count;
     int vaccine_count;
-    int infectionCount;
-    bool infectedStatus;
     
 };
 
@@ -204,6 +269,7 @@ class Citizen: public Human
 public:
     Citizen(StudentWorld* gw, double startX, double startY);
     ~Citizen();
+    void setDead();
 };
 
 
@@ -215,6 +281,12 @@ class Zombie: public Agent
 public:
     Zombie(StudentWorld* gw, double startX, double startY);
     virtual ~Zombie();
+    virtual void setDead()
+    {
+        Actor::setDead();
+        getWorld()->playSound(SOUND_ZOMBIE_DIE);
+        
+    }
     
     
 };
