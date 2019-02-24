@@ -4,8 +4,8 @@
 
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 Actor::Actor(StudentWorld* gw, int imageID, double startX, double startY,
-             Direction dir, int depth, double size)
-:GraphObject(imageID, startX, startY, dir, depth, size),
+             Direction dir, int depth)
+:GraphObject(imageID, startX, startY, dir, depth, 1),
 m_world(gw),aliveStatus(true)
 {};
 
@@ -58,10 +58,10 @@ bool Actor::checkOverlap(Actor* other, int A, int C)
 }
 
 
-//Mark: - Penelope
+//MARK: Penelope
 //Pass size here?
 Penelope::Penelope(StudentWorld* gw, double startX, double startY)
-:Actor(gw,IID_PLAYER, startX, startY, right, 0, 1),
+:Human(gw,IID_PLAYER, startX, startY, right, 0),
 flamethower_count(0),mine_count(0),vaccine_count(0),infectedStatus(false),infectionCount(0)
 {}
 
@@ -107,13 +107,44 @@ void Penelope::doSomething()
 //Mark: Wall
 
 Wall::Wall(StudentWorld* gw, double startX, double startY)
-:Actor(gw,IID_WALL, startX, startY, right, 0, 1)
+:Actor(gw,IID_WALL, startX, startY, right, 0)
 {}
 
 void Wall::doSomething(){};
     
 //Does nothing. Overriden to prevent accidental call
 void Wall::setDead(){};
+
+//##########################
+// MARK: - Activating Objects
+//##########################
+ActivatingObject::ActivatingObject(StudentWorld* gw, int id, int startX, int startY, Direction dir, int depth)
+:Actor(gw, id, startX, startY, Direction dir, int depth)
+{
     
+    
+}
+//##########################
+// MARK: - Goodies
+//##########################
+
+Goodie::Goodie(StudentWorld* gw, int imageID, double startX, double startY, Direction dir)
+:ActivatingObject(gw, imageID, startX, startY, dir, 1)
+{
+    
+    
+}
 
 
+//##########################
+// MARK: - Agent
+//##########################
+
+Agent::Agent(StudentWorld* gw, int imageID, double startX, double startY)
+:Actor(gw, imageID, startX, startY, right, 0)
+{
+    
+    
+}
+
+// MARK: Human

@@ -17,7 +17,7 @@ class StudentWorld;
 class Actor: public GraphObject
 {
 public:
-    Actor(StudentWorld* gw, int imageID, double startX, double startY, Direction dir = 0, int depth = 0, double size = 1.0);
+    Actor(StudentWorld* gw, int imageID, double startX, double startY, Direction dir = 0, int depth = 0);
     virtual ~Actor()=default;
     virtual void doSomething()=0;
     
@@ -67,62 +67,82 @@ public:
 
 class ActivatingObject: public Actor
 {
-    
+public:
+    ActivatingObject(StudentWorld* gw, int imageID, double startX, double startY, Direction dir = 0, int depth = 0);
+    virtual ~ActivatingObject();
     
 };
 
 class Exit: public ActivatingObject
 {
-    
+public:
+    Exit(StudentWorld* gw, double startX, double startY);
+    virtual ~Exit();
     
 };
 
 class Pit: public ActivatingObject
 {
-    
+public:
+    Pit(StudentWorld* gw, double startX, double startY);
+    virtual ~Pit();
     
 };
 
 class Flame: public ActivatingObject
 {
-    
+public:
+    Flame(StudentWorld* gw, double startX, double startY);
+    virtual ~Flame();
     
 };
 
 class Vomit: public ActivatingObject
 {
-    
+public:
+    Vomit(StudentWorld* gw, double startX, double startY);
+    virtual ~Vomit();
     
 };
 
 class Landmine: public ActivatingObject
 {
-    
+public:
+    Landmine(StudentWorld* gw, double startX, double startY);
+    virtual ~Landmine();
     
 };
 
 // MARK: Goodie
 class Goodie: public ActivatingObject
 {
-    
-    
+public:
+    Goodie(StudentWorld* gw, int imageID, double startX, double startY);
+    virtual ~Goodie();
 };
 
 class VaccineGoodie: public Goodie
 {
+public:
+    VaccineGoodie(StudentWorld* gw, double startX, double startY);
+    virtual ~VaccineGoodie();
     
     
 };
 
 class GasCanGoodie: public Goodie
 {
-    
+public:
+    GasCanGoodie(StudentWorld* gw, double startX, double startY);
+    virtual ~GasCanGoodie();
     
 };
 
 class LandmineGoodie: public Goodie
 {
-    
+public:
+    LandmineGoodie(StudentWorld* gw, double startX, double startY);
+    virtual ~LandmineGoodie();
     
 };
 
@@ -132,20 +152,25 @@ class LandmineGoodie: public Goodie
 //Agent is all movable objects
 class Agent: public Actor
 {
-    
+public:
+    Agent(StudentWorld* gw, int imageID, double startX, double startY);
+    virtual ~Agent();
     
     
 };
 
 class Human: public Agent
 {
-    
+public:
+    Human(StudentWorld* gw, int imageID, double startX, double startY, Direction dir = 0, int depth = 0);
+    virtual ~Human();
 };
 
 class Penelope: public Human
 {
 public:
     Penelope(StudentWorld* gw, double startX, double startY);
+    ~Penelope();
     virtual void doSomething();
     
 private:
@@ -159,14 +184,16 @@ private:
 
 class Citizen: public Human
 {
-    
-    
+public:
+    Citizen(StudentWorld* gw, double startX, double startY);
+    ~Citizen();
 };
 
 
 
 class Zombie: public Agent
 {
+public:
     
     
 };
