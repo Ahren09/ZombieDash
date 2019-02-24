@@ -131,6 +131,10 @@ int StudentWorld::init()
     return GWSTATUS_CONTINUE_GAME;
 }
 
+//##########################
+//MARK: - Move
+//##########################
+
 int StudentWorld::move()
 {
     //move all Actors in a for-loop
@@ -181,22 +185,10 @@ bool StudentWorld::isFlameBlockedAt(double x, double y) const
     bool flag=false;
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if((*it)->blockFlame() && checkOverlap)
-        
+        if((*it)->blockFlame() && checkOverlapByOneObject(x, y, (*it)))
+            flag=true;
     }
-    
-}
-
-void StudentWorld::cleanUp()
-{
-        for(std::list<Actor*>::iterator it=m_actors.begin();it != m_actors.end();it++)
-        {
-            delete *it;
-            (*it) = nullptr;
-        }
-        m_actors.erase(m_actors.begin(),m_actors.end());
-        delete pene;
-        pene=nullptr;
+    return flag;
 }
 
 //Check whether a - the Actor passed in - overlap with a specific position
@@ -211,4 +203,20 @@ bool StudentWorld::checkAllOverlap(Actor* a, int X, int Y)
     return false;
     
     
+}
+
+//##########################
+//MARK: - cleanUp
+//##########################
+
+void StudentWorld::cleanUp()
+{
+        for(std::list<Actor*>::iterator it=m_actors.begin();it != m_actors.end();it++)
+        {
+            delete *it;
+            (*it) = nullptr;
+        }
+        m_actors.erase(m_actors.begin(),m_actors.end());
+        delete pene;
+        pene=nullptr;
 }

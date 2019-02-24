@@ -28,6 +28,10 @@ public:
     {
         return citizen_count;
     }
+    void recordCitizenGone()
+    {
+        citizen_count--;
+    }
     Penelope* getPenelope() const
     {
         return pene;
@@ -46,16 +50,22 @@ public:
     // Is creation of a flame blocked at the indicated location?
     bool isFlameBlockedAt(double x, double y) const;
     
-    bool checkOverlap(double a_x, double a_y, double b_x, double b_y)
+    bool checkOverlap(double a_x, double a_y, double b_x, double b_y) const
     {
-        int d_x=abs(a_x-b_x);
-        int d_y=abs(a_y-b_y);
+        double d_x=abs(a_x-b_x);
+        double d_y=abs(a_y-b_y);
         return d_x * d_x + d_y * d_y <=100;
     }
     
-    bool checkOverlapByObject(Actor* me, Actor* other)
+    bool checkOverlapByOneObject(double x, double y, Actor* other) const
     {
-        return checkOverlap(me->getX(),me->getY(), other->getX(), other->getY())
+        return checkOverlap(x,y,other->getX(), other->getY());
+        
+    }
+    
+    bool checkOverlapByTwoObjects(Actor* me, Actor* other) const
+    {
+        return checkOverlap(me->getX(),me->getY(), other->getX(), other->getY());
     }
     
 

@@ -60,10 +60,42 @@ public:
         return false;
     }
     
+    virtual void useExitIfAppropriate()
+    {
+        
+        
+    }
+    
+    bool getNewPositionWithDir(Direction dir, const double& x, const double& y, double new_x, double new_y)
+    {
+        new_x=x;
+        new_y=y;
+        switch(dir)
+        {
+            case left:
+                new_x=x-SPRITE_WIDTH;
+                break;
+            case right:
+                new_x=x+SPRITE_WIDTH;
+                break;
+            case up:
+                new_y=y+SPRITE_WIDTH;
+                break;
+            case down:
+                new_y=y-SPRITE_WIDTH;
+                break;
+        }
+        bool X_OutOfBound = new_x<0 || new_x >= VIEW_WIDTH;
+        bool Y_OutOfBound = new_y<0 || new_y >= VIEW_HEIGHT;
+        
+        return X_OutOfBound || Y_OutOfBound;
+        
+    }
 //    bool checkOverlap(Actor* other, int A, int C);
 //    bool checkOverlapAnother(Actor* other);
     
 private:
+    
     StudentWorld* m_world;
     bool aliveStatus; //YES, aliveStatus should be valid for Pene / citizen / zombie, even pick-ups
 };
@@ -131,6 +163,19 @@ class Flame: public ActivatingObject
 public:
     Flame(StudentWorld* gw, double startX, double startY, Direction dir);
     ~Flame();
+    void doSomething();
+    int getCount()
+    {
+        return active_count;
+    }
+    
+    void decCount()
+    {
+        active_count--;
+    }
+    
+private:
+    int active_count;
     
 };
 
@@ -139,6 +184,19 @@ class Vomit: public ActivatingObject
 public:
     Vomit(StudentWorld* gw, double startX, double startY, Direction dir);
     ~Vomit();
+    void doSomething();
+    int getCount()
+    {
+        return active_count;
+    }
+    
+    void decCount()
+    {
+        active_count--;
+    }
+    
+private:
+    int active_count;
     
 };
 
@@ -149,6 +207,7 @@ public:
     ~Landmine();
     void doSomething();
     void explode();
+    virtual void dieByFallOrBurn();
     
 private:
     //return activation status and count down according to ticks

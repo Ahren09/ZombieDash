@@ -133,14 +133,33 @@ void Pit::kill()
 }
 
 Flame::Flame(StudentWorld* gw, double startX, double startY, Direction dir)
-:ActivatingObject(gw, IID_FLAME, startX, startY, dir, 0)
+:ActivatingObject(gw, IID_FLAME, startX, startY, dir, 0),
+active_count(2)
 {}
 
-Vomit::Vomit(StudentWorld* gw, double startX, double startY, Direction dir)
-:ActivatingObject(gw, IID_VOMIT, startX, startY, dir, 0)
+void Flame::doSomething()
 {
+    if(getCount()>0)
+        decCount();
     
+    else if
     
+    else setDead();
+}
+
+Vomit::Vomit(StudentWorld* gw, double startX, double startY, Direction dir)
+:ActivatingObject(gw, IID_VOMIT, startX, startY, dir, 0),
+active_count(2)
+{}
+
+void Vomit::doSomething()
+{
+    if(getCount()>0)
+        decCount();
+    
+    else if
+        
+    else setDead();
 }
 
 Landmine::Landmine(StudentWorld* gw, double startX, double startY)
@@ -306,14 +325,20 @@ void Penelope::useVaccine()
 
 void Penelope::useFlame()
 {
+    double flame_x, flame_y;
+    double prev_x=getX(), prev_y=getY();
     for(int i=1;i<=3;i++)
     {
-        
-        //TODO: Nothing blocks the flame
-        if()
+        //IF position of the flame is valid
+        if(getNewPositionWithDir(getDirection(), prev_x, prev_y, flame_x, flame_y))
         {
-            
-            
+            //No Exits or Walls block the flame
+            if(!getWorld()->isFlameBlockedAt(flame_x, flame_y))
+            {
+                getWorld()->addActor(new Flame(getWorld(),flame_x,flame_y,getDirection()));
+                prev_x=flame_x;
+                prev_y=flame_y;
+            }
         }
         //There exist objects blocking the flame
         else break;
