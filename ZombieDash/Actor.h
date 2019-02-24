@@ -50,7 +50,7 @@ public:
         return false;
     }
     
-    virtual bool canKillByLandmine()
+    virtual bool canKillByLandmine() const
     {
         return false;
     }
@@ -132,7 +132,20 @@ class Landmine: public ActivatingObject
 public:
     Landmine(StudentWorld* gw, double startX, double startY);
     ~Landmine();
+    void doSomething();
+    void explode();
     
+private:
+    //return activation status and count down according to ticks
+    bool activationCountDown()
+    {
+        if(activation_count>0)
+            activation_count--;
+        else activation_status=true;
+        return activation_status;
+    }
+    int activation_count;
+    bool activation_status;
 };
 
 //*************
@@ -144,6 +157,11 @@ public:
     Goodie(StudentWorld* gw, int imageID, double startX, double startY);
     virtual ~Goodie();
     virtual void doSomething();
+    
+    virtual bool canKillByFlame() const
+    {
+        return true;
+    }
 };
 
 class VaccineGoodie: public Goodie
@@ -183,6 +201,16 @@ public:
     virtual ~Agent();
     virtual void dieByFallOrBurn()=0;
     
+    virtual bool canKillByFlame() const
+    {
+        return true;
+    }
+    
+    virtual bool canKillByLandmine() const
+    {
+        return true;
+    }
+    
 };
 
 //*************
@@ -211,6 +239,11 @@ public:
         infectedStatus=false;
     }
     virtual void setDead();
+    
+    bool canInfectByVomit() const
+    {
+        return true;
+    }
     
 private:
     int infectionCount;

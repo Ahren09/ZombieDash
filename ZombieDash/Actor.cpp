@@ -122,7 +122,7 @@ Pit::Pit(StudentWorld* gw, double startX, double startY)
 
 void Pit::doSomething()
 {
-    for(vector<Actor*>::iterator it=)
+    
     
 }
 
@@ -134,10 +134,7 @@ void Pit::kill()
 
 Flame::Flame(StudentWorld* gw, double startX, double startY, Direction dir)
 :ActivatingObject(gw, IID_FLAME, startX, startY, dir, 0)
-{
-    
-    
-}
+{}
 
 Vomit::Vomit(StudentWorld* gw, double startX, double startY, Direction dir)
 :ActivatingObject(gw, IID_VOMIT, startX, startY, dir, 0)
@@ -147,10 +144,23 @@ Vomit::Vomit(StudentWorld* gw, double startX, double startY, Direction dir)
 }
 
 Landmine::Landmine(StudentWorld* gw, double startX, double startY)
-:ActivatingObject(gw, IID_LANDMINE, startX, startY, right, 1)
+:ActivatingObject(gw, IID_LANDMINE, startX, startY, right, 1),
+activation_count(30),activation_status(false)
+{}
+
+void Landmine::doSomething()
 {
-    
-    
+    //IF Landmine is activated
+    if(activationCountDown())
+    {
+        
+        
+    }
+}
+
+void Landmine::explode()
+{
+    getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
 }
 
 
