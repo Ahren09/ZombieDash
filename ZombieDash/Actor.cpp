@@ -268,7 +268,17 @@ void Penelope::doSomething()
             case KEY_PRESS_RIGHT:
                 moveRight();
                 break;
+            case KEY_PRESS_TAB:
+                //TODO:
+                 break;
                 
+            case KEY_PRESS_SPACE:
+                //TODO:
+                break;
+                
+            case KEY_PRESS_ENTER:
+                //TODO:
+                break;
                 
                 
         }
@@ -315,8 +325,17 @@ void Citizen::doSomething()
     Human::doSomething();
     if(!isAlive())
     {
-        getWorld()->playSound(SOUND_CITIZEN_);
+        
     }
+}
+
+//Citizen die when infection count reaches 500
+void Citizen::dieOfInfection()
+{
+    setDead();
+    getWorld()->playSound(SOUND_ZOMBIE_BORN);
+    getWorld()->addActor(new Zombie(getX(),getY()));
+    
 }
 
 

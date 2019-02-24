@@ -40,6 +40,21 @@ public:
     void moveLeft();
     void moveRight();
     
+    virtual bool canKillByFlame() const
+    {
+        return false;
+    }
+    
+    virtual bool canInfectByVomit() const
+    {
+        return false;
+    }
+    
+    virtual bool canKillByLandmine()
+    {
+        return false;
+    }
+    
     bool checkOverlap(Actor* other, int A, int C);
     bool checkOverlapAnother(Actor* other);
     
@@ -270,6 +285,8 @@ public:
     Citizen(StudentWorld* gw, double startX, double startY);
     ~Citizen();
     void setDead();
+    void dieOfInfection();
+    void doSomething();
 };
 
 
@@ -281,6 +298,7 @@ class Zombie: public Agent
 public:
     Zombie(StudentWorld* gw, double startX, double startY);
     virtual ~Zombie();
+    virtual void doSomething();
     virtual void setDead()
     {
         Actor::setDead();
@@ -296,6 +314,7 @@ class DumbZombie: public Zombie
 public:
     DumbZombie(StudentWorld* gw, double startX, double startY);
     ~DumbZombie();
+    void doSomething();
     
 };
 
@@ -304,6 +323,7 @@ class SmartZombie: public Zombie
 public:
     SmartZombie(StudentWorld* gw, double startX, double startY);
     ~SmartZombie();
+    void doSomething();
     
 };
 
