@@ -48,26 +48,26 @@ void Actor::moveRight()
 
 //To check whether two Actors overlap, we simply check whether vertices of the other Actor is contained
 //in scope of this Actor
-bool Actor::checkOverlap(Actor* other, int A, int C)
-{
-    int B=A+SPRITE_WIDTH-1, D=C+SPRITE_HEIGHT-1;
-    int A_=other->getX(), B_=other->getX()+SPRITE_WIDTH-1, C_=other->getY(), D_=other->getY()+SPRITE_HEIGHT-1;
-    
-    
-    return ((A <= A_ && A_ <= B && C <= C_ && C_ < D) ||
-            (A <= B_ && B_ <= B && C <= C_ && C_ < D) ||
-            (A <= A_ && A_ <= B && C <= D_ && D_ < D) ||
-            (A <= B_ && B_ <= B && C <= D_ && D_ < D));
-}
+//bool Actor::checkOverlap(Actor* other, int A, int C)
+//{
+//    int B=A+SPRITE_WIDTH-1, D=C+SPRITE_HEIGHT-1;
+//    int A_=other->getX(), B_=other->getX()+SPRITE_WIDTH-1, C_=other->getY(), D_=other->getY()+SPRITE_HEIGHT-1;
+//
+//
+//    return ((A <= A_ && A_ <= B && C <= C_ && C_ < D) ||
+//            (A <= B_ && B_ <= B && C <= C_ && C_ < D) ||
+//            (A <= A_ && A_ <= B && C <= D_ && D_ < D) ||
+//            (A <= B_ && B_ <= B && C <= D_ && D_ < D));
+//}
 
 //Returns true if Euclidean distance is less than 10
-bool Actor::checkOverlapAnother(Actor *other)
-{
-    int d_x=abs(getX()-other->getX());
-    int d_y=abs(getY()-other->getY());
-    
-    return d_x * d_x + d_y * d_y <=100;
-}
+//bool Actor::checkOverlapAnother(Actor *other)
+//{
+//    int d_x=abs(getX()-other->getX());
+//    int d_y=abs(getY()-other->getY());
+//    
+//    return d_x * d_x + d_y * d_y <=100;
+//}
 
 
 
@@ -308,6 +308,7 @@ void Penelope::useFlame()
 {
     for(int i=1;i<=3;i++)
     {
+        
         //TODO: Nothing blocks the flame
         if()
         {

@@ -176,6 +176,17 @@ int StudentWorld::move()
     
 }
 
+bool StudentWorld::isFlameBlockedAt(double x, double y) const
+{
+    bool flag=false;
+    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        if((*it)->blockFlame() && checkOverlap)
+        
+    }
+    
+}
+
 void StudentWorld::cleanUp()
 {
         for(std::list<Actor*>::iterator it=m_actors.begin();it != m_actors.end();it++)

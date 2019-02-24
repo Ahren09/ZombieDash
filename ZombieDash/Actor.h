@@ -55,8 +55,13 @@ public:
         return false;
     }
     
-    bool checkOverlap(Actor* other, int A, int C);
-    bool checkOverlapAnother(Actor* other);
+    virtual bool blockFlame() const
+    {
+        return false;
+    }
+    
+//    bool checkOverlap(Actor* other, int A, int C);
+//    bool checkOverlapAnother(Actor* other);
     
 private:
     StudentWorld* m_world;
@@ -72,7 +77,12 @@ class Wall: public Actor
 public:
     Wall(StudentWorld* gw, double startX, double startY);
     virtual void doSomething();
-    virtual void setDead();
+    virtual void setDead(){}
+    
+    bool blockFlame(Actor* flame)
+    {
+        return true;
+    }
     
 };
 
@@ -97,6 +107,11 @@ public:
     Exit(StudentWorld* gw, double startX, double startY);
     ~Exit();
     void doSomething();
+    bool blockFlame(Actor* flame)
+    {
+        return true;
+    }
+    
     
     
 };
