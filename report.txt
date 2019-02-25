@@ -4,3 +4,7 @@ All Goodies have depth=1.0
 The following two are not needed in ActivatingObject class
 	virtual ~ActivatingObject();
 	virtual void doSomething();
+
+Since the function that calls it passes in an Actor*
+setInfectionStatus() must be defined in Actor class(which can be pure virtual function)
+It can be redefined in Human class

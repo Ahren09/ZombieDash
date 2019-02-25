@@ -205,6 +205,14 @@ void StudentWorld::killByFlameIfAppropriate(Flame* flame)
     
 }
 
+void StudentWorld::infectByVomitIfAppropriate(Vomit* vomit)
+{
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        vomit->infectByVomitIfAppropriate(*it);
+    
+}
+
 void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, double y, Direction dir)
 {
     if(!isFlameBlockedAt(x, y))

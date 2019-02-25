@@ -50,18 +50,21 @@ public:
     void killByFlameIfAppropriate(Flame* flame);
     
     
-    void killByLandmineIfAppropriate(Landmine* landmine)
-    {
-        for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-        {
-            if((*it)->canKillByLandmine() && checkOverlapByTwoObjects(landmine, (*it)))
-            {
-                
-                landmine->explode((*it)->getDirection());
-            }
-        }
-        
-    }
+//    void killByLandmineIfAppropriate(Landmine* landmine)
+//    {
+//        for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+//        {
+//            if((*it)->canKillByLandmine() && checkOverlapByTwoObjects(landmine, (*it)))
+//            {
+//                
+//                landmine->explode((*it)->getDirection());
+//            }
+//        }
+//        
+//    }
+    
+    void infectByVomitIfAppropriate(Vomit* vomit);
+    
     
     //Try to introduce a Flame object at specified xy location
     void introduceFlameIfAppropriate(Landmine* landmine, double x, double y, Direction dir);

@@ -53,6 +53,8 @@ public:
     virtual bool canInfectByVomit() const
      { return false; }
     
+    virtual void setInfectionStatus() = 0;
+    
     // Does this object block flames?
     virtual bool blocksFlame() const
     {
@@ -195,7 +197,7 @@ public:
     void decCount()
     { active_count--; }
     
-    void canInfectByVomit(Actor* a);
+    void infectByVomitIfAppropriate(Actor* a);
     
 private:
     int active_count;
@@ -236,7 +238,7 @@ public:
     virtual void doSomething();
     virtual void activateIfAppropriate(Actor* a);
     virtual void dieByFallOrBurnIfAppropriate();
-    virtual void pickUp(Penelope* p) = 0;
+    virtual void pickUp(Penelope* p);
     
     virtual bool canKillByLandmine() const
     { return true; }
@@ -303,6 +305,8 @@ public:
     { return infectedStatus; }
     int getInfectionCount() const
     { return infectionCount; }
+    void setInfectionStatus()
+    { infectedStatus=true; }
 
     void clearInfection()
     {
@@ -343,11 +347,11 @@ public:
     
     // Increase the number of flame charges the object has.
     void increaseFlameCharges()
-    { flame_count++; }
+    { flame_count+=5; }
     
     // Increase the number of landmines the object has.
     void increaseLandmines()
-    { mine_count++; }
+    { mine_count+=2; }
     
     // How many vaccines does the object have?
     int getNumVaccines() const

@@ -119,14 +119,15 @@ active_count(2)
 void Flame::doSomething()
 {
     if(getCount()>0)
+    {
         decCount();
-    
-    else if
+        getWorld()->killByFlameIfAppropriate(this);
+    }
     
     else setDead();
 }
 
-
+//Set Agents that overlap with Flame to dead
 void Flame::killByFlameIfAppropriate(Actor* a)
 {
     if(a->canKillByFlame() && getWorld()-> checkOverlapByTwoObjects(this, a))
@@ -144,12 +145,23 @@ active_count(2)
 void Vomit::doSomething()
 {
     if(getCount()>0)
-        decCount();
-    
-    else if
         
+    {
+        decCount();
+        getWorld()->infectByVomitIfAppropriate(this);
+    }
     else setDead();
 }
+
+//Set Agents that overlap with Flame to dead
+void Vomit::infectByVomitIfAppropriate(Actor *a)
+{
+    if(a->canInfectByVomit() && getWorld()->checkOverlapByTwoObjects(this, a))
+    {
+        a->setInfectionStatus();
+    }
+}
+
 
 Landmine::Landmine(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_LANDMINE, startX, startY, right, 1),
@@ -224,19 +236,31 @@ void Goodie::activateIfAppropriate(Actor *a)
     
 }
 
+void Goodie::pickUp(Penelope *p)
+{
+    setDead();
+    getWorld()->playSound(SOUND_GOT_GOODIE);
+    
+}
+
 void Goodie::doSomething()
 {
-    if(checkOverlapAnother(getWorld()->getPenelope()))
+    Penelope* p = getWorld()->getPenelope();
+    if(getWorld()->checkOverlapByTwoObjects(this, p))
     {
-        setDead();
-        getWorld()->playSound(SOUND_GOT_GOODIE);
-        getWorld()->getPenelope()->increaseVaccines();
+        pickUp(p);
     }
 }
 
 VaccineGoodie::VaccineGoodie(StudentWorld* gw, double startX, double startY)
 :Goodie(gw, IID_VACCINE_GOODIE, startX, startY)
 {}
+
+void VaccineGoodie::pickUp(Penelope *p)
+{
+    Goodie::pickUp(p);
+    getWorld()->getPenelope()->increaseVaccines();
+}
 
 void VaccineGoodie::doSomething()
 {
@@ -248,6 +272,12 @@ GasCanGoodie::GasCanGoodie(StudentWorld* gw, double startX, double startY)
 :Goodie(gw, IID_GAS_CAN_GOODIE, startX, startY)
 {}
 
+void GasCanGoodie::pickUp(Penelope *p)
+{
+    Goodie::pickUp(p);
+    getWorld()->getPenelope()->increaseFlameCharges();
+}
+
 void GasCanGoodie::doSomething()
 {
     Goodie::doSomething();
@@ -258,10 +288,15 @@ LandmineGoodie::LandmineGoodie(StudentWorld* gw, double startX, double startY)
 :Goodie(gw, IID_LANDMINE_GOODIE, startX, startY)
 {}
 
+void LandmineGoodie::pickUp(Penelope *p)
+{
+    Goodie::pickUp(p);
+    getWorld()->getPenelope()->increaseLandmines();
+}
 void LandmineGoodie::doSomething()
 {
     Goodie::doSomething();
-    getWorld()->getPenelope()->increaseLandmines();
+    
 }
 
 
