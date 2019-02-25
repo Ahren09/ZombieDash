@@ -81,17 +81,13 @@ public:
     }
     
     bool checkOverlapByOneObject(double x, double y, Actor* other) const
-    {
-        return checkOverlap(x,y,other->getX(), other->getY());
-        
-    }
+    { return checkOverlap(x,y,other->getX(), other->getY()); }
     
     bool checkOverlapByTwoObjects(Actor* me, Actor* other) const
-    {
-        return checkOverlap(me->getX(),me->getY(), other->getX(), other->getY());
-    }
+    {  return checkOverlap(me->getX(),me->getY(), other->getX(), other->getY()); }
     
-
+    bool getNewPositionWithDir(Direction dir, double& x, double& y);
+    
 private:
     std::list<Actor*> m_actors;
     int citizen_count;

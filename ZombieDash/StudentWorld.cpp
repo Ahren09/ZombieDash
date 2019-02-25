@@ -30,6 +30,32 @@ StudentWorld::~StudentWorld()
     
 }
 
+//Check whether the new location is still in StudentWorld
+//Returns false if x y coordinates are out of bound, true otherwise.
+bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
+{
+    switch(dir)
+    {
+        case Actor::left:
+            x-=SPRITE_WIDTH;
+            break;
+        case Actor::right:
+            x+=SPRITE_WIDTH;
+            break;
+        case Actor::up:
+            y+=SPRITE_WIDTH;
+            break;
+        case Actor::down:
+            y-=SPRITE_WIDTH;
+            break;
+    }
+    bool X_OutOfBound = x<0 || x >= VIEW_WIDTH;
+    bool Y_OutOfBound = y<0 || y >= VIEW_HEIGHT;
+    
+    return X_OutOfBound || Y_OutOfBound;
+}
+
+
 int StudentWorld::init()
 {
     Level lev(assetPath());
