@@ -190,7 +190,7 @@ void Landmine::activateIfAppropriate(Actor* a)
 
 
 //Introduce surrounding flames and create pit
-void Landmine::explode(Direction dir)
+void Landmine::explode()
 {
     getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
     int x=getX();
@@ -198,15 +198,15 @@ void Landmine::explode(Direction dir)
     
     
     //Introduce surrounding flame objects
-    getWorld()->introduceFlameIfAppropriate(this, x, y, dir);
-    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y, dir);
-    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y, dir );
-    getWorld()->introduceFlameIfAppropriate(this, x, y+SPRITE_HEIGHT, dir);
-    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y+SPRITE_HEIGHT, dir);
-    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y+SPRITE_HEIGHT, dir);
-    getWorld()->introduceFlameIfAppropriate(this, x, y-SPRITE_HEIGHT, dir);
-    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y-SPRITE_HEIGHT, dir);
-    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y-SPRITE_HEIGHT, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x, y, up);
+    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y, up);
+    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y, up);
+    getWorld()->introduceFlameIfAppropriate(this, x, y+SPRITE_HEIGHT, up);
+    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y+SPRITE_HEIGHT, up);
+    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y+SPRITE_HEIGHT, up);
+    getWorld()->introduceFlameIfAppropriate(this, x, y-SPRITE_HEIGHT, up);
+    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y-SPRITE_HEIGHT, up);
+    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y-SPRITE_HEIGHT, up);
     
     //Introduce a pit at location of Landmine;
     getWorld()->introducePitIfAppropriate(this, x, y);
@@ -328,11 +328,22 @@ void Human::doSomething()
     }
 }
 
+void Human::useExitIfAppropriate(Exit* exit)
+{
+    if(getWorld()->checkOverlapByTwoObjects(this, exit))
+    { setDead(); }
+}
+
 Citizen::Citizen(StudentWorld* gw, double startX, double startY)
 :Human(gw, IID_CITIZEN, startX, startY)
+{}
+
+void Citizen::useExitIfAppropriate(Exit* exit)
 {
-    
-    
+    Human::useExitIfAppropriate(exit);
+    getWorld()->increaseScore(500);
+    getWorld()->playSound(SOUND_CITIZEN_SAVED);
+    getWorld()->recordCitizenGone();
 }
 
 Penelope::Penelope(StudentWorld* gw, double startX, double startY)
@@ -390,25 +401,23 @@ void Penelope::useVaccine()
     if(vaccine_count>0)
     {
         vaccine_count--;
-        clearInfectedStatus();
+        clearInfection();
     }
 }
 
-void Penelope::useFlame()
+void Penelope::useGasCan()
 {
-    double flame_x, flame_y;
-    double prev_x=getX(), prev_y=getY();
-    for(int i=1;i<=3;i++)
+    double flame_x=getX(), flame_y=getY();
+    Direction dir=getDirection();
+    for(int i=0;i<3;i++)
     {
         //IF position of the flame is valid
-        if(getNewPositionWithDir(getDirection(), prev_x, prev_y, flame_x, flame_y))
+        if(getWorld()->getNewPositionWithDir(dir, flame_x, flame_y))
         {
             //No Exits or Walls block the flame
             if(!getWorld()->isFlameBlockedAt(flame_x, flame_y))
             {
-                getWorld()->addActor(new Flame(getWorld(),flame_x,flame_y,getDirection()));
-                prev_x=flame_x;
-                prev_y=flame_y;
+                getWorld()->addActor(new Flame(getWorld(),flame_x,flame_y,up));
             }
         }
         //There exist objects blocking the flame
@@ -419,6 +428,16 @@ void Penelope::useFlame()
 void Penelope::useLandmine()
 {
     getWorld()->addActor(new Landmine(getWorld(),getX(),getY()));
+}
+
+void Penelope::useExitIfAppropriate(Exit* exit)
+{
+    if(getWorld()->checkOverlapByTwoObjects(this, exit))
+    {
+        if(getWorld()->getCitizenCount() == 0)
+        {
+            getWorld()->recordLevelFinishedIfAllCitizensGone();
+        }
 }
 
 void Citizen::setDead()

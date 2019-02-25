@@ -8,3 +8,22 @@ The following two are not needed in ActivatingObject class
 Since the function that calls it passes in an Actor*
 setInfectionStatus() must be defined in Actor class(which can be pure virtual function)
 It can be redefined in Human class
+
+
+I was thinking of putting clearInfection() in Penelope class, since a citizen's infection
+status cannot be cleared once it's infected
+
+void clearInfection()
+{
+    infectionCount=0;
+    infectedStatus=false;
+}
+
+However, since infectedStatus is a private data member of Human class, I have no way to
+access this variable aside from defining a function in Human class
+
+Thus I define this function in Penelope class, and redefine it in Citizen class:
+void clearInfection()
+{}
+
+so that a Citizen's infection status will never be erased accidentally

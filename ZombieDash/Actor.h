@@ -7,6 +7,7 @@
 class StudentWorld;
 class Goodie;
 class Penelope;
+class Exit;
 
 class Actor: public GraphObject
 {
@@ -15,9 +16,7 @@ public:
     virtual void doSomething()=0;
     
     StudentWorld* getWorld() const
-    {
-        return m_world;
-    }
+    { return m_world; }
     
     bool isAlive() const
     { return aliveStatus; }
@@ -30,7 +29,7 @@ public:
     virtual void activateIfAppropriate(Actor* a);
     
     // If this object uses exits, use the exit.
-    virtual void useExitIfAppropriate(){}
+    virtual void useExitIfAppropriate(Exit* exit){}
     
     // If this object can die by falling into a pit or burning, die.
     virtual void dieByFallOrBurnIfAppropriate();
@@ -53,13 +52,11 @@ public:
     virtual bool canInfectByVomit() const
      { return false; }
     
-    virtual void setInfectionStatus() = 0;
+    virtual void setInfectionStatus();
     
     // Does this object block flames?
     virtual bool blocksFlame() const
-    {
-        return false;
-    }
+    { return false; }
     
     // Can this object cause a zombie to vomit?
     virtual bool triggersZombieVomit() const;
@@ -72,13 +69,6 @@ public:
     void moveDown();
     void moveLeft();
     void moveRight();
-    
-    
-    //returns true
-        
-    }
-//    bool checkOverlap(Actor* other, int A, int C);
-//    bool checkOverlapAnother(Actor* other);
     
 private:
     
@@ -97,7 +87,7 @@ public:
     virtual void doSomething();
     virtual void setDead(){}
     
-    bool blockFlame(Actor* flame) const
+    bool blocksFlame(Actor* flame) const
     { return true; }
     
     virtual bool canKillByFlame() const
@@ -286,14 +276,16 @@ public:
     { return infectionCount; }
     void setInfectionStatus()
     { infectedStatus=true; }
-
-    void clearInfection()
+    
+    virtual void clearInfection()
     {
         infectionCount=0;
         infectedStatus=false;
     }
     
-   virtual void beVomitedOnIfAppropriate();
+    virtual void useExitIfAppropriate(Exit* exit);
+    
+    virtual void beVomitedOnIfAppropriate();
     
     virtual bool canInfectByVomit() const
     { return true; }
@@ -314,9 +306,6 @@ public:
     virtual void doSomething();
     void fire(Direction dir); //Fire flame
     
-    
-    void addMine();
-    void useVaccine();
     
     virtual void pickUpGoodieIfAppropriate(Goodie* g);
     
@@ -344,9 +333,13 @@ public:
     int getNumLandmines() const
     { return mine_count; }
     
-    void useFlame();
+    void useGasCan();
     
     void useLandmine();
+    
+    void useVaccine();
+    
+    void useExitIfAppropriate(Exit* exit);
     
 private:
     int flame_count;
@@ -362,8 +355,9 @@ class Citizen: public Human
 public:
     Citizen(StudentWorld* gw, double startX, double startY);
     virtual void doSomething();
-    virtual void useExitIfAppropriate();
+    void useExitIfAppropriate(Exit* exit);
     virtual void dieByFallOrBurnIfAppropriate();
+    virtual void clearInfection(){}
 };
 
 

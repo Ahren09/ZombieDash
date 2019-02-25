@@ -20,31 +20,21 @@ public:
     virtual int move();
     virtual void cleanUp();
     bool checkAllOverlap(Actor* a, int X, int Y);
-    void setGameFinished()
-    {
-        gameFinished=true;
-    }
+    
+    void recordLevelFinishedIfAllCitizensGone()
+    { gameFinished=true; }
+    
     int getCitizenCount() const
-    {
-        return citizen_count;
-    }
+    { return citizen_count; }
+    
     void recordCitizenGone()
-    {
-        citizen_count--;
-    }
+    { citizen_count--; }
     Penelope* getPenelope() const
-    {
-        return pene;
-    }
+    { return pene; }
     
     void addActor(Actor* actor)
     {
         m_actors.push_back(actor);
-    }
-    
-    const std::list<Actor*> &getAllActors()
-    {
-        return m_actors;
     }
     
     void killByFlameIfAppropriate(Flame* flame);
@@ -87,6 +77,9 @@ public:
     {  return checkOverlap(me->getX(),me->getY(), other->getX(), other->getY()); }
     
     bool getNewPositionWithDir(Direction dir, double& x, double& y);
+    
+    bool checkValidPosition(double& x, double& y)
+    { return x>=0 && y>=0 && x<VIEW_WIDTH && VIEW_HEIGHT; }
     
 private:
     std::list<Actor*> m_actors;

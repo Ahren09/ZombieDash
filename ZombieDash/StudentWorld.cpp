@@ -31,7 +31,8 @@ StudentWorld::~StudentWorld()
 }
 
 //Check whether the new location is still in StudentWorld
-//Returns false if x y coordinates are out of bound, true otherwise.
+//Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
+//Returns true otherwise, and set x,y to new values
 bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
 {
     switch(dir)
@@ -206,6 +207,8 @@ int StudentWorld::move()
     
 }
 
+//Check whether the given position is in StudentWorld
+//AND NOT being blocked by an exit or a Wall
 bool StudentWorld::isFlameBlockedAt(double x, double y) const
 {
     bool flag=false;
@@ -236,17 +239,23 @@ void StudentWorld::infectByVomitIfAppropriate(Vomit* vomit)
     for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
         vomit->infectByVomitIfAppropriate(*it);
-    
+    }
 }
 
 void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, double y, Direction dir)
 {
     if(!isFlameBlockedAt(x, y))
     {
-        addActor(new Flame(this, x,y, dir));
+        addActor(new Flame(this, x,y, Actor::up));
     }
-    
 }
+
+void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, double y)
+{
+    if(getNewPositionWithDir(up, <#double &x#>, <#double &y#>))
+}
+
+
 
 ////Check whether a - the Actor passed in - overlap with a specific position
 //bool StudentWorld::checkAllOverlap(Actor* a, int X, int Y)
