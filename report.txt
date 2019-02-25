@@ -1,1 +1,6 @@
 All Goodies have depth=1.0
+
+
+The following two are not needed in ActivatingObject class
+	virtual ~ActivatingObject();
+	virtual void doSomething();

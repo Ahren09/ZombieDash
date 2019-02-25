@@ -185,25 +185,48 @@ bool StudentWorld::isFlameBlockedAt(double x, double y) const
     bool flag=false;
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if((*it)->blockFlame() && checkOverlapByOneObject(x, y, (*it)))
+        if((*it)->blocksFlame() && checkOverlapByOneObject(x, y, (*it)))
             flag=true;
     }
     return flag;
 }
 
-//Check whether a - the Actor passed in - overlap with a specific position
-bool StudentWorld::checkAllOverlap(Actor* a, int X, int Y)
+void StudentWorld::killByFlameIfAppropriate(Flame* flame)
 {
     for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if((*it) == a) continue;
-        if(a->checkOverlap(*it, X, Y))
-            return true;
+        if((*it)->canKillByFlame() && checkOverlapByTwoObjects(flame, (*it)))
+        {
+            (*it)->setDead();
+            
+        }
+        
     }
-    return false;
-    
     
 }
+
+void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, double y, Direction dir)
+{
+    if(!isFlameBlockedAt(x, y))
+    {
+        addActor(new Flame(this, x,y, dir));
+    }
+    
+}
+
+////Check whether a - the Actor passed in - overlap with a specific position
+//bool StudentWorld::checkAllOverlap(Actor* a, int X, int Y)
+//{
+//    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+//    {
+//        if((*it) == a) continue;
+//        if(a->checkOverlap(*it, X, Y))
+//            return true;
+//    }
+//    return false;
+//    
+//    
+//}
 
 //##########################
 //MARK: - cleanUp

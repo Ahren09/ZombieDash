@@ -46,31 +46,6 @@ void Actor::moveRight()
     
 }
 
-//To check whether two Actors overlap, we simply check whether vertices of the other Actor is contained
-//in scope of this Actor
-//bool Actor::checkOverlap(Actor* other, int A, int C)
-//{
-//    int B=A+SPRITE_WIDTH-1, D=C+SPRITE_HEIGHT-1;
-//    int A_=other->getX(), B_=other->getX()+SPRITE_WIDTH-1, C_=other->getY(), D_=other->getY()+SPRITE_HEIGHT-1;
-//
-//
-//    return ((A <= A_ && A_ <= B && C <= C_ && C_ < D) ||
-//            (A <= B_ && B_ <= B && C <= C_ && C_ < D) ||
-//            (A <= A_ && A_ <= B && C <= D_ && D_ < D) ||
-//            (A <= B_ && B_ <= B && C <= D_ && D_ < D));
-//}
-
-//Returns true if Euclidean distance is less than 10
-//bool Actor::checkOverlapAnother(Actor *other)
-//{
-//    int d_x=abs(getX()-other->getX());
-//    int d_y=abs(getY()-other->getY());
-//    
-//    return d_x * d_x + d_y * d_y <=100;
-//}
-
-
-
 //Mark: Wall
 
 Wall::Wall(StudentWorld* gw, double startX, double startY)
@@ -126,11 +101,15 @@ void Pit::doSomething()
     
 }
 
-
-void Pit::kill()
+void Pit::killByPitIfAppropriate(Actor* a)
 {
-    if(checkOverlapAnother(<#Actor *other#>))
+    if(a->canKillByPit() && getWorld()->checkOverlapByTwoObjects(this, a) )
+    {
+        a->setDead();
+    }
+    
 }
+
 
 Flame::Flame(StudentWorld* gw, double startX, double startY, Direction dir)
 :ActivatingObject(gw, IID_FLAME, startX, startY, dir, 0),
@@ -146,6 +125,16 @@ void Flame::doSomething()
     
     else setDead();
 }
+
+
+void Flame::killByFlameIfAppropriate(Actor* a)
+{
+    if(a->canKillByFlame() && getWorld()-> checkOverlapByTwoObjects(this, a))
+    {
+        a->setDead();
+    }
+}
+
 
 Vomit::Vomit(StudentWorld* gw, double startX, double startY, Direction dir)
 :ActivatingObject(gw, IID_VOMIT, startX, startY, dir, 0),
@@ -177,10 +166,43 @@ void Landmine::doSomething()
     }
 }
 
-void Landmine::explode()
+void Landmine::activateIfAppropriate(Actor* a)
+{
+    
+    if(getWorld()->checkOverlapByTwoObjects(this, a))
+    {
+        //TODO: generate flame and pit
+    }
+    
+}
+
+
+//Introduce surrounding flames and create pit
+void Landmine::explode(Direction dir)
 {
     getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
+    int x=getX();
+    int y=getY();
+    
+    
+    //Introduce surrounding flame objects
+    getWorld()->introduceFlameIfAppropriate(this, x, y, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y, dir );
+    getWorld()->introduceFlameIfAppropriate(this, x, y+SPRITE_HEIGHT, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y+SPRITE_HEIGHT, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y+SPRITE_HEIGHT, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x, y-SPRITE_HEIGHT, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y-SPRITE_HEIGHT, dir);
+    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y-SPRITE_HEIGHT, dir);
+    
+    //Introduce a pit at location of Landmine;
+    getWorld()->introducePitIfAppropriate(this, x, y);
+    
+    //Set status to dead
+    setDead();
 }
+
 
 
 
@@ -196,36 +218,50 @@ Goodie::Goodie(StudentWorld* gw, int imageID, double startX, double startY)
 :ActivatingObject(gw, imageID, startX, startY, right, 1)
 {}
 
-void VaccineGoodie::doSomething()
+void Goodie::activateIfAppropriate(Actor *a)
+{
+    
+    
+}
+
+void Goodie::doSomething()
 {
     if(checkOverlapAnother(getWorld()->getPenelope()))
     {
         setDead();
         getWorld()->playSound(SOUND_GOT_GOODIE);
         getWorld()->getPenelope()->increaseVaccines();
-        
     }
 }
 
 VaccineGoodie::VaccineGoodie(StudentWorld* gw, double startX, double startY)
 :Goodie(gw, IID_VACCINE_GOODIE, startX, startY)
+{}
+
+void VaccineGoodie::doSomething()
 {
-    
-    
+    Goodie::doSomething();
+    getWorld()->getPenelope()->increaseVaccines();
 }
 
 GasCanGoodie::GasCanGoodie(StudentWorld* gw, double startX, double startY)
 :Goodie(gw, IID_GAS_CAN_GOODIE, startX, startY)
+{}
+
+void GasCanGoodie::doSomething()
 {
-    
-    
+    Goodie::doSomething();
+    getWorld()->getPenelope()->increaseFlameCharges();
 }
 
 LandmineGoodie::LandmineGoodie(StudentWorld* gw, double startX, double startY)
 :Goodie(gw, IID_LANDMINE_GOODIE, startX, startY)
+{}
+
+void LandmineGoodie::doSomething()
 {
-    
-    
+    Goodie::doSomething();
+    getWorld()->getPenelope()->increaseLandmines();
 }
 
 
