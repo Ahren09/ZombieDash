@@ -259,6 +259,9 @@ public:
     virtual bool canKillByPit() const
     { return true; }
     
+    virtual bool blocksAgent() const
+    { return true; }
+    
     
 };
 
@@ -358,6 +361,8 @@ public:
     void useExitIfAppropriate(Exit* exit);
     virtual void dieByFallOrBurnIfAppropriate();
     virtual void clearInfection(){}
+    
+    virtual void turnIntoZombie();
 };
 
 
@@ -374,7 +379,11 @@ public:
         getWorld()->playSound(SOUND_ZOMBIE_DIE);
         
     }
+    virtual void computeVomitPosition(double& x,double& y);
+    virtual bool vomitIfAppropriate(const double& x, const double& y);
     
+private:
+    bool hasVaccine;
     
 };
 

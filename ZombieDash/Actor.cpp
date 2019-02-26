@@ -336,7 +336,10 @@ void Human::useExitIfAppropriate(Exit* exit)
 
 Citizen::Citizen(StudentWorld* gw, double startX, double startY)
 :Human(gw, IID_CITIZEN, startX, startY)
-{}
+{
+    gw->
+    
+}
 
 void Citizen::useExitIfAppropriate(Exit* exit)
 {
@@ -438,14 +441,18 @@ void Penelope::useExitIfAppropriate(Exit* exit)
         {
             getWorld()->recordLevelFinishedIfAllCitizensGone();
         }
+    }
 }
 
-void Citizen::setDead()
+void Citizen::dieByFallOrBurnIfAppropriate()
 {
-    Human::setDead();
+    setDead();
     getWorld()->increaseScore(-1000);
 }
 
+
+    
+    
 void Citizen::doSomething()
 {
     Human::doSomething();
@@ -456,21 +463,57 @@ void Citizen::doSomething()
 }
 
 //Citizen die when infection count reaches 500
-void Citizen::dieOfInfection()
+void Citizen::turnIntoZombie()
 {
     setDead();
     getWorld()->playSound(SOUND_ZOMBIE_BORN);
-    getWorld()->addActor(new Zombie(getX(),getY()));
+    int randnum=randInt(1, 10);
+    if(randnum>0 && randnum<=3)
+        getWorld()->addActor(new SmartZombie(gw, getX(),getY(),getDirection()));
+    else getWorld()->addActor(new DumbZombie(gw, getX(),getY(),getDirection()));
     
 }
+    
+    
+    
 
 
 //*************
 // MARK: Zombie
 Zombie::Zombie(StudentWorld* gw, double startX, double startY)
-:Agent(gw, IID_ZOMBIE, startX, startY)
+:Agent(gw, IID_ZOMBIE, startX, startY),hasVaccine(false)
 {
+    gw->increaseZombieCount();
+    if(getWorl)
     
+}
+
+void Zombie::computeVomitPosition(double& x,double& y)
+{
+    Direction dir = getDirection();
+    switch(dir)
+    {
+        case left:
+            x-=SPRITE_WIDTH;
+        case right:
+            x+=SPRITE_WIDTH;
+        case up:
+            y+=SPRITE_HEIGHT;
+        case down:
+            y-=SPRITE_HEIGHT;
+    }
+}
+
+//return true if zombie vomits, false otherwise
+bool Zombie::vomitIfAppropriate(const double& x, const double& y)
+{
+    if(randInt(1, 3) == 3)
+    {
+        getWorld()->addActor(new Vomit(getWorld(),x,y));
+        getWorld()->playSound(SOUND_ZOMBIE_VOMIT);
+        return true;
+    }
+    return false;
     
 }
 
@@ -481,9 +524,15 @@ DumbZombie::DumbZombie(StudentWorld* gw, double startX, double startY)
     
 }
 
-SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)
-:Zombie(gw, startX, startY)
+void DumbZombie::doSomething()
 {
+    if(getWorld()->checkTick())
+        return;
+    
     
     
 }
+
+SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)
+:Zombie(gw, startX, startY)
+{}

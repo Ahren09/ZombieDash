@@ -20,8 +20,8 @@ GameWorld* createStudentWorld(string assetPath)
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
 {
-    int citizen_count=0;
-    
+    citizen_count=0;
+    zombie_count=0;
 }
 
 StudentWorld::~StudentWorld()
@@ -164,6 +164,8 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
+    updateTick();
+    
     //move all Actors in a for-loop
     if(getLives()>0)
         pene->doSomething();
@@ -255,6 +257,12 @@ void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, dou
     if(getNewPositionWithDir(up, <#double &x#>, <#double &y#>))
 }
 
+bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* a, double& distance)
+{
+    distance=computeDistance(x, y, a->getX(), a->getY());
+    return distance<=100;
+    
+}
 
 
 ////Check whether a - the Actor passed in - overlap with a specific position

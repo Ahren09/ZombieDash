@@ -27,6 +27,9 @@ public:
     int getCitizenCount() const
     { return citizen_count; }
     
+    int getZombieCount() const
+    { return zombie_count; }
+    
     void recordCitizenGone()
     { citizen_count--; }
     Penelope* getPenelope() const
@@ -38,6 +41,15 @@ public:
     }
     
     void killByFlameIfAppropriate(Flame* flame);
+    
+    void increaseZombieCount()
+    { zombie_count++; }
+    
+    void decreaseZombieCount()
+    { zombie_count--; }
+    
+    void decreaseCitizenCount()
+    { citizen_count--; }
     
     
 //    void killByLandmineIfAppropriate(Landmine* landmine)
@@ -63,6 +75,13 @@ public:
     // Is creation of a flame blocked at the indicated location?
     bool isFlameBlockedAt(double x, double y) const;
     
+    int computeDistance(double a_x, double a_y, double b_x, double b_y)
+    {
+        double d_x=abs(a_x-b_x);
+        double d_y=abs(a_y-b_y);
+        return d_x * d_x + d_y * d_y;
+    }
+    
     bool checkOverlap(double a_x, double a_y, double b_x, double b_y) const
     {
         double d_x=abs(a_x-b_x);
@@ -81,12 +100,25 @@ public:
     bool checkValidPosition(double& x, double& y)
     { return x>=0 && y>=0 && x<VIEW_WIDTH && VIEW_HEIGHT; }
     
+    //return true if current tick is even tick
+    //update tick status
+    bool checkTick() const
+    { return isEvenTick; }
+    
+    bool updateTick()
+    {   isEvenTick = !isEvenTick; }
+    
+    bool locateNearestVomitTrigger(double x, double y, Actor* a, double& distance);
+    
 private:
     std::list<Actor*> m_actors;
     int citizen_count;
+    int zombie_count;
     Penelope* pene;
     
     bool gameFinished;
+    
+    bool isEvenTick;
     
     
 };
