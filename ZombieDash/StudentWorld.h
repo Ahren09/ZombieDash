@@ -108,7 +108,11 @@ public:
     bool updateTick()
     {   isEvenTick = !isEvenTick; }
     
-    bool locateNearestVomitTrigger(double x, double y, Actor* a, double& distance);
+    bool locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance);
+    
+    bool determineNewPosition(Direction dir, double x, double y, double distance);
+    
+    bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;
     
 private:
     std::list<Actor*> m_actors;

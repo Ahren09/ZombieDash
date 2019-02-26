@@ -30,30 +30,39 @@ StudentWorld::~StudentWorld()
     
 }
 
-//Check whether the new location is still in StudentWorld
-//Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
-//Returns true otherwise, and set x,y to new values
-bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
+bool determineNewPosition(Direction dir, double x, double y, double distance)
 {
+    
     switch(dir)
     {
         case Actor::left:
-            x-=SPRITE_WIDTH;
+            x-=distance;
             break;
         case Actor::right:
-            x+=SPRITE_WIDTH;
+            x+=distance;
             break;
         case Actor::up:
-            y+=SPRITE_WIDTH;
+            y+=distance;
             break;
         case Actor::down:
-            y-=SPRITE_WIDTH;
+            y-=distance;
             break;
     }
     bool X_OutOfBound = x<0 || x >= VIEW_WIDTH;
     bool Y_OutOfBound = y<0 || y >= VIEW_HEIGHT;
     
     return X_OutOfBound || Y_OutOfBound;
+    
+}
+
+//Check whether the new location is still in StudentWorld
+//Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
+//Returns true otherwise, and set x,y to new values
+bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
+{
+    if( dir==Actor::left || dir == Actor::right )
+        return determineNewPosition(dir, x, y, SPRITE_WIDTH);
+    else return determineNewPosition(dir, x, y, SPRITE_HEIGHT);
 }
 
 
@@ -257,10 +266,38 @@ void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, dou
     if(getNewPositionWithDir(up, <#double &x#>, <#double &y#>))
 }
 
-bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* a, double& distance)
+bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance)
 {
-    distance=computeDistance(x, y, a->getX(), a->getY());
-    return distance<=100;
+    double min_dist;
+    double target_x,target_y;
+    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        if((*it)->canInfectByVomit())
+        {
+            target_x=(*it)->getX();
+            target_y=(*it)->getY();
+            distance=(x-target_x)*(x-target_x)+(y-target_y)*(y-target_y);
+            if(distance<min_dist)
+            {
+                min_dist=distance;
+                target=(*it);
+            }
+        }
+    }
+    return min_dist<=100;
+    
+}
+
+bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
+{
+    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        if((*it)->blocksAgent() && checkOverlapByOneObject((*it), x, y));
+        {
+            return true;
+        }
+    }
+    return false;
     
 }
 

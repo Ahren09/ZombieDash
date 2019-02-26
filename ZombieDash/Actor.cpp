@@ -484,7 +484,7 @@ Zombie::Zombie(StudentWorld* gw, double startX, double startY)
 :Agent(gw, IID_ZOMBIE, startX, startY),hasVaccine(false)
 {
     gw->increaseZombieCount();
-    if(getWorl)
+    moves=randInt(3, 10);
     
 }
 
@@ -509,11 +509,30 @@ bool Zombie::vomitIfAppropriate(const double& x, const double& y)
 {
     if(randInt(1, 3) == 3)
     {
-        getWorld()->addActor(new Vomit(getWorld(),x,y));
+        getWorld()->addActor(new Vomit(getWorld(),x,y,getDirection()));
         getWorld()->playSound(SOUND_ZOMBIE_VOMIT);
         return true;
     }
     return false;
+    
+}
+
+//TODO: Use bool here?
+void Zombie::moveToNewPosition()
+{
+    Direction dir=getDirection();
+    double x=getX(), y=getY();
+    
+    //if the new position is valid
+    if(getWorld()->determineNewPosition(dir, x, y, 1))
+    {
+        if(getMoves()>0 && !getWorld()->isAgentMovementBlockedAt(this,x,y))
+        {
+            moveTo(x,y);
+            decreaseMoves();
+        }
+        else setMoves(0);
+    }
     
 }
 
@@ -526,11 +545,21 @@ DumbZombie::DumbZombie(StudentWorld* gw, double startX, double startY)
 
 void DumbZombie::doSomething()
 {
-    if(getWorld()->checkTick())
-        return;
+    if(!isAlive() || getWorld()->checkTick() ) return;
     
-    
-    
+    double vomit_x=getX(), vomit_y=getY();
+    computeVomitPosition(vomit_x, vomit_y);
+    double distance;
+    Actor* target;
+    if(getWorld()->locateNearestVomitTrigger(vomit_x, vomit_y, target, distance))
+    {
+        if(vomitIfAppropriate(vomit_x, vomit_y))
+            return;
+    }
+
+    if(getMoves() == 0)
+        setNewDirAndMoves();
+    moveToNewPosition();
 }
 
 SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)

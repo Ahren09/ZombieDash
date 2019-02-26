@@ -58,6 +58,9 @@ public:
     virtual bool blocksFlame() const
     { return false; }
     
+    virtual bool blocksAgent() const
+    { return false; }
+    
     // Can this object cause a zombie to vomit?
     virtual bool triggersZombieVomit() const;
     
@@ -92,6 +95,9 @@ public:
     
     virtual bool canKillByFlame() const
     { return false; }
+    
+    virtual bool blocksAgent() const
+    { return true; }
 };
 
 //##########################
@@ -377,14 +383,46 @@ public:
     {
         Actor::setDead();
         getWorld()->playSound(SOUND_ZOMBIE_DIE);
-        
     }
     virtual void computeVomitPosition(double& x,double& y);
     virtual bool vomitIfAppropriate(const double& x, const double& y);
     
+    
+    virtual void moveToNewPosition();
+    
+    int getMoves()
+    { return moves; }
+    
+    void setMoves(int n)
+    { moves = n; }
+    
+    void decreaseMoves()
+    { moves--; }
+    
+    virtual void setNewDirAndMoves()
+    {
+        int moves=randInt(3,10);
+        int dir=randInt(0,3);
+        switch(dir)
+        {
+            case 0:
+                setDirection(right);
+                break;
+            case 1:
+                setDirection(up);
+                break;
+            case 2:
+                setDirection(left);
+                break;
+            case 3:
+                setDirection(down);
+                break;
+        }
+    }
+    
 private:
     bool hasVaccine;
-    
+    int moves;
 };
 
 class DumbZombie: public Zombie

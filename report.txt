@@ -27,3 +27,29 @@ void clearInfection()
 {}
 
 so that a Citizen's infection status will never be erased accidentally
+
+
+Here is my initialization of a function that computes location with respect to direction
+an actor is facing
+bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
+{
+    if( dir==Actor::left || dir == Actor::right )
+        return determineNewPosition(dir, x, y, SPRITE_WIDTH);
+    else return determineNewPosition(dir, x, y, SPRITE_HEIGHT);
+}
+
+Since we see that left/right/up/down are const int defined in GraphObject, "Actor::" must
+be added to indicate that
+
+
+//###############
+To iterate through a list within a const function, we must use a const iterator since the
+compiler assumes that we do NOT alter the list.
+for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
+
+
+//###############
+Format of using a reference to a pointer
+'*' should be placed before '&'
+For example, if we are to declare an Actor pointer:
+	Actor* &a
