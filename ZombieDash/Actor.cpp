@@ -101,13 +101,12 @@ void Pit::doSomething()
     
 }
 
-void Pit::killByPitIfAppropriate(Actor* a)
+void Pit::activateIfAppropriate(Actor* a)
 {
     if(a->canKillByPit() && getWorld()->checkOverlapByTwoObjects(this, a) )
     {
         a->setDead();
     }
-    
 }
 
 
@@ -128,11 +127,12 @@ void Flame::doSomething()
 }
 
 //Set Agents that overlap with Flame to dead
-void Flame::killByFlameIfAppropriate(Actor* a)
+void Flame::activateIfAppropriate(Actor* a)
 {
     if(a->canKillByFlame() && getWorld()-> checkOverlapByTwoObjects(this, a))
     {
         a->setDead();
+        a->dieByFallOrBurnIfAppropriate();
     }
 }
 
@@ -447,6 +447,7 @@ void Penelope::useExitIfAppropriate(Exit* exit)
 void Citizen::dieByFallOrBurnIfAppropriate()
 {
     setDead();
+    getWorld()->playSound(SOUND_CITIZEN_DIE);
     getWorld()->increaseScore(-1000);
 }
 
@@ -484,7 +485,7 @@ Zombie::Zombie(StudentWorld* gw, double startX, double startY)
 :Agent(gw, IID_ZOMBIE, startX, startY),hasVaccine(false)
 {
     gw->increaseZombieCount();
-    moves=randInt(3, 10);
+    moves=0;
     
 }
 
@@ -558,10 +559,65 @@ void DumbZombie::doSomething()
     }
 
     if(getMoves() == 0)
-        setNewDirAndMoves();
+        setNewDirAndMoves(); //function overriden in SmartZombie
     moveToNewPosition();
 }
 
 SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)
 :Zombie(gw, startX, startY)
 {}
+
+void SmartZombie::setNewDirection()
+{
+    double distance=INT_MAX;
+    int moves=randInt(3,10);
+    Actor* target;
+    bool isThreat = false;
+    double target_x=INT_MAX, target_y=INT_MAX;
+    if(getWorld()->locateNearestCitizenTrigger(getX(), getY(), target_x, target_y, target, distance, isThreat))
+    {
+        setDirection(pickDirection(getX(),getY(),target_x,target_y));
+    }
+    else Zombie::setNewDirection();
+}
+
+
+void SmartZombie::moveToNewPosition()
+{
+    
+}
+
+Direction SmartZombie::pickDirection(double x, double y, double target_x, double target_y)
+{
+    double d_x=target_x-x;
+    double d_y=target_y-y;
+    
+    vector<Direction> direction_pool;
+    
+    
+    if(d_x>0)
+    {
+        direction_pool.push_back(right);
+    }
+    
+    else if(d_x<0)
+    {
+        direction_pool.push_back(left);
+    }
+    
+    if(d_y>0)
+    {
+        direction_pool.push_back(up);
+    }
+    else if(d_y<0)
+    {
+        direction_pool.push_back(down);
+    }
+    Direction ret;
+    if(direction_pool.size()==1)
+    {
+        return direction_pool[0];
+    }
+    else return direction_pool[randInt(0,1)];
+    
+}

@@ -137,7 +137,7 @@ public:
     virtual bool canKillByFlame() const
     { return false; }
     
-    void killByPitIfAppropriate(Actor* a);
+    //void killByPitIfAppropriate(Actor* a);
     
 };
 
@@ -379,14 +379,16 @@ class Zombie: public Agent
 {
 public:
     Zombie(StudentWorld* gw, double startX, double startY);
-    virtual void setDead()
-    {
-        Actor::setDead();
-        getWorld()->playSound(SOUND_ZOMBIE_DIE);
-    }
+    
     virtual void computeVomitPosition(double& x,double& y);
     virtual bool vomitIfAppropriate(const double& x, const double& y);
     
+    virtual void dieByFallOrBurnIfAppropriate()
+    {
+        setDead();
+        getWorld()->playSound(SOUND_ZOMBIE_DIE);
+        
+    }
     
     virtual void moveToNewPosition();
     
@@ -399,9 +401,11 @@ public:
     void decreaseMoves()
     { moves--; }
     
-    virtual void setNewDirAndMoves()
+    virtual void setNewMoves()
+    { int moves=randInt(3,10); }
+    
+    virtual void setNewDirection()
     {
-        int moves=randInt(3,10);
         int dir=randInt(0,3);
         switch(dir)
         {
@@ -430,7 +434,11 @@ class DumbZombie: public Zombie
 public:
     DumbZombie(StudentWorld* gw, double startX, double startY);
     void doSomething();
-    virtual void dieByFallOrBurnIfAppropriate();
+    virtual void dieByFallOrBurnIfAppropriate()
+    {
+        Zombie::dieByFallOrBurnIfAppropriate();
+        getWorld()->increaseScore(1000);
+    }
 };
 
 class SmartZombie: public Zombie
@@ -438,7 +446,17 @@ class SmartZombie: public Zombie
 public:
     SmartZombie(StudentWorld* gw, double startX, double startY);
     void doSomething();
-    virtual void dieByFallOrBurnIfAppropriate();
+    virtual void dieByFallOrBurnIfAppropriate()
+    {
+        Zombie::dieByFallOrBurnIfAppropriate();
+        getWorld()->increaseScore(2000);
+    }
+    
+    void moveToNewPosition();
+    
+    virtual void setNewDirection();
+    
+    Direction pickDirection(double x, double y, double target_x, double target_y);
     
 };
 

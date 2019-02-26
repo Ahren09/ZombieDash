@@ -268,7 +268,8 @@ void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, dou
 
 bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance)
 {
-    double min_dist;
+    double dist;
+    distance=INT_MAX;
     double target_x,target_y;
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
@@ -276,16 +277,37 @@ bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target,
         {
             target_x=(*it)->getX();
             target_y=(*it)->getY();
-            distance=(x-target_x)*(x-target_x)+(y-target_y)*(y-target_y);
-            if(distance<min_dist)
+            dist=(x-target_x)*(x-target_x)+(y-target_y)*(y-target_y);
+            if(distance>dist)
             {
-                min_dist=distance;
+                distance=dist;
                 target=(*it);
             }
         }
     }
-    return min_dist<=100;
+    return distance<=100;
     
+}
+
+bool StudentWorld::locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const
+{
+    double dist;
+    distance=INT_MAX;
+    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        if((*it)->canInfectByVomit())
+        {
+            target_x=(*it)->getX();
+            target_y=(*it)->getY();
+            dist=(zombie_x-target_x)*(zombie_x-target_x)+(zombie_y-target_y)*(zombie_y-target_y);
+            if(distance>dist)
+            {
+                distance=dist;
+                target=(*it);
+            }
+        }
+    }
+    return distance<=6400;
 }
 
 bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
@@ -300,21 +322,6 @@ bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
     return false;
     
 }
-
-
-////Check whether a - the Actor passed in - overlap with a specific position
-//bool StudentWorld::checkAllOverlap(Actor* a, int X, int Y)
-//{
-//    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-//    {
-//        if((*it) == a) continue;
-//        if(a->checkOverlap(*it, X, Y))
-//            return true;
-//    }
-//    return false;
-//    
-//    
-//}
 
 //##########################
 //MARK: - cleanUp

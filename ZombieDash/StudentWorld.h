@@ -110,6 +110,8 @@ public:
     
     bool locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance);
     
+    bool locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const
+    
     bool determineNewPosition(Direction dir, double x, double y, double distance);
     
     bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;
