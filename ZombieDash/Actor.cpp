@@ -482,11 +482,10 @@ void Citizen::turnIntoZombie()
 //*************
 // MARK: Zombie
 Zombie::Zombie(StudentWorld* gw, double startX, double startY)
-:Agent(gw, IID_ZOMBIE, startX, startY),hasVaccine(false)
+:Agent(gw, IID_ZOMBIE, startX, startY)
 {
     gw->increaseZombieCount();
     moves=0;
-    
 }
 
 void Zombie::computeVomitPosition(double& x,double& y)
@@ -515,7 +514,6 @@ bool Zombie::vomitIfAppropriate(const double& x, const double& y)
         return true;
     }
     return false;
-    
 }
 
 //TODO: Use bool here?
@@ -527,41 +525,75 @@ void Zombie::moveToNewPosition()
     //if the new position is valid
     if(getWorld()->determineNewPosition(dir, x, y, 1))
     {
-        if(getMoves()>0 && !getWorld()->isAgentMovementBlockedAt(this,x,y))
+        if(!getWorld()->isAgentMovementBlockedAt(this,x,y))
         {
             moveTo(x,y);
             decreaseMoves();
         }
         else setMoves(0);
     }
+}
+
+void Zombie::setNewDirection()
+{
+    int dir=randInt(0,3);
+    switch(dir)
+    {
+        case 0:
+            setDirection(right);
+            break;
+        case 1:
+            setDirection(up);
+            break;
+        case 2:
+            setDirection(left);
+            break;
+        case 3:
+            setDirection(down);
+            break;
+    }
+}
+
+void Zombie::doSomething()
+{
+    //Zombie is dead OR Number of ticks is even
+    if(!isAlive() || getWorld()->checkTick() ) return;
+    
+    //Vomit if appropriate
+    double vomit_x=getX(), vomit_y=getY();
+    computeVomitPosition(vomit_x, vomit_y);
+    double distance;
+    Actor* target;
+    
+    if(getWorld()->locateNearestVomitTrigger(vomit_x, vomit_y, target, distance))
+    {
+        //If zombie vomits
+        if(vomitIfAppropriate(vomit_x, vomit_y))
+            return;
+    }
+    
+    if(getMoves() == 0)
+    {
+        setNewMoves();
+    }
+    //function overriden in SmartZombie
+    setNewDirection();
+    moveToNewPosition();
     
 }
 
 DumbZombie::DumbZombie(StudentWorld* gw, double startX, double startY)
 :Zombie(gw, startX, startY)
-{
-    
-    
-}
+{}
 
-void DumbZombie::doSomething()
+void DumbZombie::dropVaccineByChance(const double x, const double y)
 {
-    if(!isAlive() || getWorld()->checkTick() ) return;
-    
-    double vomit_x=getX(), vomit_y=getY();
-    computeVomitPosition(vomit_x, vomit_y);
-    double distance;
-    Actor* target;
-    if(getWorld()->locateNearestVomitTrigger(vomit_x, vomit_y, target, distance))
+    if(randInt(1, 10)==10)
     {
-        if(vomitIfAppropriate(vomit_x, vomit_y))
-            return;
+        getWorld()->addActor(new VaccineGoodie(gw,x,y));
     }
-
-    if(getMoves() == 0)
-        setNewDirAndMoves(); //function overriden in SmartZombie
-    moveToNewPosition();
 }
+
 
 SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)
 :Zombie(gw, startX, startY)
@@ -570,7 +602,6 @@ SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)
 void SmartZombie::setNewDirection()
 {
     double distance=INT_MAX;
-    int moves=randInt(3,10);
     Actor* target;
     bool isThreat = false;
     double target_x=INT_MAX, target_y=INT_MAX;
@@ -581,19 +612,12 @@ void SmartZombie::setNewDirection()
     else Zombie::setNewDirection();
 }
 
-
-void SmartZombie::moveToNewPosition()
-{
-    
-}
-
 Direction SmartZombie::pickDirection(double x, double y, double target_x, double target_y)
 {
     double d_x=target_x-x;
     double d_y=target_y-y;
     
-    vector<Direction> direction_pool;
-    
+    std::vector<Direction> direction_pool;
     
     if(d_x>0)
     {
@@ -613,7 +637,7 @@ Direction SmartZombie::pickDirection(double x, double y, double target_x, double
     {
         direction_pool.push_back(down);
     }
-    Direction ret;
+    
     if(direction_pool.size()==1)
     {
         return direction_pool[0];

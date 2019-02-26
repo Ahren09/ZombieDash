@@ -382,13 +382,14 @@ public:
     
     virtual void computeVomitPosition(double& x,double& y);
     virtual bool vomitIfAppropriate(const double& x, const double& y);
+    virtual void doSomething();
     
     virtual void dieByFallOrBurnIfAppropriate()
     {
         setDead();
         getWorld()->playSound(SOUND_ZOMBIE_DIE);
-        
     }
+    
     
     virtual void moveToNewPosition();
     
@@ -404,28 +405,9 @@ public:
     virtual void setNewMoves()
     { int moves=randInt(3,10); }
     
-    virtual void setNewDirection()
-    {
-        int dir=randInt(0,3);
-        switch(dir)
-        {
-            case 0:
-                setDirection(right);
-                break;
-            case 1:
-                setDirection(up);
-                break;
-            case 2:
-                setDirection(left);
-                break;
-            case 3:
-                setDirection(down);
-                break;
-        }
-    }
+    virtual void setNewDirection();
     
 private:
-    bool hasVaccine;
     int moves;
 };
 
@@ -433,27 +415,29 @@ class DumbZombie: public Zombie
 {
 public:
     DumbZombie(StudentWorld* gw, double startX, double startY);
-    void doSomething();
+    //void doSomething();
     virtual void dieByFallOrBurnIfAppropriate()
     {
         Zombie::dieByFallOrBurnIfAppropriate();
+        dropVaccineByChance(getX(), getY());
         getWorld()->increaseScore(1000);
+        
     }
+    void dropVaccineByChance(const double x, const double y);
+    
 };
 
 class SmartZombie: public Zombie
 {
 public:
     SmartZombie(StudentWorld* gw, double startX, double startY);
-    void doSomething();
+    //void doSomething();
+    
     virtual void dieByFallOrBurnIfAppropriate()
     {
         Zombie::dieByFallOrBurnIfAppropriate();
         getWorld()->increaseScore(2000);
     }
-    
-    void moveToNewPosition();
-    
     virtual void setNewDirection();
     
     Direction pickDirection(double x, double y, double target_x, double target_y);
