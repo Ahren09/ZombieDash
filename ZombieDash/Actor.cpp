@@ -3,6 +3,8 @@
 #include "GameWorld.h"
 #include <cmath>
 #include <vector>
+#include <algorithm>
+
 
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 Actor::Actor(StudentWorld* gw, int imageID, double startX, double startY,
@@ -465,48 +467,121 @@ void Citizen::doSomething()
     Human::doSomething();
     if(!isAlive())
     {
-        
+        //TODO: Check Alive
     }
-}
-
-void Citizen::moveToNewPosition()
-{
     double zombie_x, zombie_y, dist_z, dist_p;
     double p_x, p_y;
-    bool hasMoved=false;
     
-    Penelope* p=getWorld()->getPenelope();
+    //Calculate distance from Penelope & Nearest Zombie
+    getWorld()->locateNearestCitizenThreat(getX(), getY(), zombie_x, zombie_y, dist_z);
+    getWorld()->getPenelopeDist(getX(), getY(), p_x, p_y, dist_p);
     
-    //IF Penelope is within 80px
-    if(getWorld()->getPenelopeDist(getX(), getY(), p_x, p_y, dist_p))
+    //
+    //IF Penelope is within 80px, AND Penelope is closer to the nearest zombie OR there's no Zombie
+    if((getWorld()->getZombieCount()==0 || dist_p<=dist_z) && dist_p<=6400 )
     {
-        std::vector<Direction> direction_pool;
+        if(moveToPenelope(p_x,p_y)) return;
+    }
+    
+    //ELSE try to escape nearest Zombie
+    else if(dist_z<=6400)
+    {
+        moveAwayFromZombie(zombie_x, zombie_y);
+    }
+    
+}
+
+bool Citizen::moveToPenelope(double p_x, double p_y)
+{
+    bool successfulMove=false;
+    
+    std::vector<Direction> direction_pool;
+    double new_x, new_y;
+    bool oneMove=pickDirection(getX(), getY(), p_x, p_y, direction_pool);
         
-        //Penelop is on the same row/col, ONE direction available
-        if(pickDirection(getX(), getY(), p_x, p_y, direction_pool))
+    //Penelop is on the same row/col, ONE direction available
+    if(oneMove)
+    {
+        getWorld()->determineNewPosition(direction_pool[0], new_x, new_y, 2);
+        //Not blocked
+        successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
+        if(successfulMove)
         {
-            double new_x, new_y;
-            getWorld()->determineNewPosition(direction_pool[0], new_x, new_y, 2);
-            if(getWorld()->isAgentMovementBlockedAt(this, new_x, new_y))
-                moveTo(new_x,new_y);
+            setDirection(direction_pool[0]);
+            moveTo(new_x,new_y);
         }
         
+        
+        //Citizen is blocked. First Direction fails
         //Penelop is NOT on the same row/col, TWO directions available
-        else
+        else if(!oneMove)
         {
-            
+            getWorld()->determineNewPosition(direction_pool[1], new_x, new_y, 2);
+            //Not blocked
+            successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
+            if(successfulMove)
+            {
+                setDirection(direction_pool[1]);
+                moveTo(new_x,new_y);
+            }
         }
-        
     }
     
+    return successfulMove;
+}
+
+bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
+{
     
-    //ELSE IF Penelope is more than 80px away
-    if(getWorld()->locateNearestCitizenThreat(getX(), getY(), zombie_x, zombie_y, dist_z))
+    std::vector<Direction> direction_pool;
+    bool successfulMove=false;
+    bool oneMove=pickReverseDirection(getX(), getY(), zombie_x, zombie_y, direction_pool);
+    double new_x, new_y;
+    
+    
+    //Zombie is on the same row/col, ONE direction available
+    if(oneMove)
     {
-        
-           
+        getWorld()->determineNewPosition(direction_pool[0], new_x, new_y, 2);
+        //Not blocked
+        successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
+        if(successfulMove)
+        {
+            setDirection(direction_pool[0]);
+            moveTo(new_x,new_y);
+        }
+        //Citizen is blocked. First Direction fails
+        //Zombie is NOT on the same row/col, TWO directions available
+        else if(!oneMove)
+        {
+            getWorld()->determineNewPosition(direction_pool[1], new_x, new_y, 2);
+            //Not blocked
+            successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
+            if(successfulMove)
+            {
+                setDirection(direction_pool[1]);
+                moveTo(new_x,new_y);
+            }
+        }
     }
     
+    return successfulMove;
+    
+}
+
+bool Citizen::pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<Direction> direction_pool)
+{
+    std::vector<Direction> temp;
+    pickDirection(x, y, OtherX, OtherY,temp);
+    if(std::find(temp.begin(),temp.end(),left)!= temp.end())
+        direction_pool.push_back(right);
+    if(std::find(temp.begin(),temp.end(),right)== temp.end())
+        direction_pool.push_back(left);
+    if(std::find(temp.begin(),temp.end(),up)== temp.end())
+        direction_pool.push_back(down);
+    if(std::find(temp.begin(),temp.end(),down)== temp.end())
+        direction_pool.push_back(up);
+    return direction_pool.size()==1;
 }
 
 bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std::vector<Direction> direction_pool)
@@ -666,7 +741,7 @@ void DumbZombie::dropVaccineByChance(const double x, const double y)
 {
     if(randInt(1, 10)==10)
     {
-        getWorld()->addActor(new VaccineGoodie(gw,x,y));
+        getWorld()->addActor(new VaccineGoodie(getWorld(),x,y));
     }
 }
 

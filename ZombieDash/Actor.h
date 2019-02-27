@@ -382,13 +382,15 @@ public:
     
     virtual void turnIntoZombie();
     
-    virtual void moveToNewPosition();
+    virtual bool moveToPenelope(double p_x, double p_y);
+    
+    bool moveAwayFromZombie(double zombie_x, double zombie_y);
     
     //Returns true if Citizen is on the same row/col as Penelope
     bool pickDirection(double x, double y, double target_x, double target_y,std::vector<Direction> direction_pool);
     
-private:
-    virtual void 
+    bool pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<Direction> direction_pool);
+
 };
 
 

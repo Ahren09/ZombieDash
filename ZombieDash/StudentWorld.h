@@ -36,9 +36,7 @@ public:
     { return pene; }
     
     void addActor(Actor* actor)
-    {
-        m_actors.push_back(actor);
-    }
+    { m_actors.push_back(actor); }
     
     void killByFlameIfAppropriate(Flame* flame);
     
