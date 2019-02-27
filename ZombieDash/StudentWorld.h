@@ -110,11 +110,26 @@ public:
     
     bool locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance);
     
-    bool locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const
+    bool locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const;
+    
+    bool locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance) const;
     
     bool determineNewPosition(Direction dir, double x, double y, double distance);
     
+    //returns true if there is agent blocking ag
     bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;
+    
+    //Get Citizen's distance to Penelope, returns true if less than 80
+    bool getPenelopeDist(double x, double y, double& p_x, double& p_y, double dist_p)
+    {
+        p_x=pene->getX();
+        p_y=pene->getY();
+        dist_p=computeDistance(x, y, p_x, p_y);
+        return dist_p<=6400;
+    }
+    
+    
+   
     
 private:
     std::list<Actor*> m_actors;

@@ -408,10 +408,11 @@ void Penelope::useVaccine()
     }
 }
 
-void Penelope::useGasCan()
+void Penelope::fireGasCan()
 {
     double flame_x=getX(), flame_y=getY();
     Direction dir=getDirection();
+    bool flag=false;
     for(int i=0;i<3;i++)
     {
         //IF position of the flame is valid
@@ -420,12 +421,14 @@ void Penelope::useGasCan()
             //No Exits or Walls block the flame
             if(!getWorld()->isFlameBlockedAt(flame_x, flame_y))
             {
+                flag=true;
                 getWorld()->addActor(new Flame(getWorld(),flame_x,flame_y,up));
             }
         }
         //There exist objects blocking the flame
         else break;
     }
+    if(flag) getWorld()->playSound(SOUND_PLAYER_FIRE);
 }
 
 void Penelope::useLandmine()
@@ -456,6 +459,9 @@ void Citizen::dieByFallOrBurnIfAppropriate()
     
 void Citizen::doSomething()
 {
+    if(getWorld()->checkTick())
+        return;
+    
     Human::doSomething();
     if(!isAlive())
     {
@@ -463,10 +469,80 @@ void Citizen::doSomething()
     }
 }
 
+void Citizen::moveToNewPosition()
+{
+    double zombie_x, zombie_y, dist_z, dist_p;
+    double p_x, p_y;
+    bool hasMoved=false;
+    
+    Penelope* p=getWorld()->getPenelope();
+    
+    //IF Penelope is within 80px
+    if(getWorld()->getPenelopeDist(getX(), getY(), p_x, p_y, dist_p))
+    {
+        std::vector<Direction> direction_pool;
+        
+        //Penelop is on the same row/col, ONE direction available
+        if(pickDirection(getX(), getY(), p_x, p_y, direction_pool))
+        {
+            double new_x, new_y;
+            getWorld()->determineNewPosition(direction_pool[0], new_x, new_y, 2);
+            if(getWorld()->isAgentMovementBlockedAt(this, new_x, new_y))
+                moveTo(new_x,new_y);
+        }
+        
+        //Penelop is NOT on the same row/col, TWO directions available
+        else
+        {
+            
+        }
+        
+    }
+    
+    
+    //ELSE IF Penelope is more than 80px away
+    if(getWorld()->locateNearestCitizenThreat(getX(), getY(), zombie_x, zombie_y, dist_z))
+    {
+        
+           
+    }
+    
+}
+
+bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std::vector<Direction> direction_pool)
+{
+    double d_x=OtherX-x;
+    double d_y=OtherY-y;
+    
+    if(d_x>0)
+    {
+        direction_pool.push_back(right);
+    }
+    
+    else if(d_x<0)
+    {
+        direction_pool.push_back(left);
+    }
+    
+    if(d_y>0)
+    {
+        direction_pool.push_back(up);
+    }
+    else if(d_y<0)
+    {
+        direction_pool.push_back(down);
+    }
+    
+    else return direction_pool.size()==1;
+    
+}
+
+
 //Citizen die when infection count reaches 500
 void Citizen::turnIntoZombie()
 {
     setDead();
+    getWorld()->increaseScore(-1000);
     getWorld()->playSound(SOUND_ZOMBIE_BORN);
     int randnum=randInt(1, 10);
     if(randnum>0 && randnum<=3)

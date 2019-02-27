@@ -67,6 +67,9 @@ public:
     // Does this object trigger landmines only when they're active?
     virtual bool triggersOnlyActiveLandmines() const;
     
+    virtual void isZombie()
+    { return true; }
+    
     
     void moveUp();
     void moveDown();
@@ -269,6 +272,7 @@ public:
     { return true; }
     
     
+    
 };
 
 //*************
@@ -315,6 +319,11 @@ public:
     virtual void doSomething();
     void fire(Direction dir); //Fire flame
     
+    virtual void dieByFallOrBurnIfAppropriate()
+    {
+        setDead();
+        getWorld()->playSound(SOUND_PLAYER_DIE);
+    }
     
     virtual void pickUpGoodieIfAppropriate(Goodie* g);
     
@@ -342,13 +351,16 @@ public:
     int getNumLandmines() const
     { return mine_count; }
     
-    void useGasCan();
+    //
+    void fireGasCan();
     
     void useLandmine();
     
     void useVaccine();
     
     void useExitIfAppropriate(Exit* exit);
+    
+    
     
 private:
     int flame_count;
@@ -369,6 +381,14 @@ public:
     virtual void clearInfection(){}
     
     virtual void turnIntoZombie();
+    
+    virtual void moveToNewPosition();
+    
+    //Returns true if Citizen is on the same row/col as Penelope
+    bool pickDirection(double x, double y, double target_x, double target_y,std::vector<Direction> direction_pool);
+    
+private:
+    virtual void 
 };
 
 
@@ -383,6 +403,8 @@ public:
     virtual void computeVomitPosition(double& x,double& y);
     virtual bool vomitIfAppropriate(const double& x, const double& y);
     virtual void doSomething();
+    virtual void isZombie()
+    { return true; }
     
     virtual void dieByFallOrBurnIfAppropriate()
     {

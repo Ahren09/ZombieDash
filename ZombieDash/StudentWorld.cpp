@@ -293,28 +293,61 @@ bool StudentWorld::locateNearestCitizenTrigger(double zombie_x, double zombie_y,
 {
     double dist;
     distance=INT_MAX;
+    
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
         if((*it)->canInfectByVomit())
         {
-            target_x=(*it)->getX();
-            target_y=(*it)->getY();
-            dist=(zombie_x-target_x)*(zombie_x-target_x)+(zombie_y-target_y)*(zombie_y-target_y);
+            double x=(*it)->getX();
+            double y=(*it)->getY();
+            dist=(zombie_x-x)*(zombie_x-x)+(zombie_y-y)*(zombie_y-y);
             if(distance>dist)
             {
                 distance=dist;
                 target=(*it);
+                target_x=x;
+                target_y=y;
             }
         }
     }
     return distance<=6400;
 }
 
+//Locate nearest Zombie to the Citizen
+//Called by Citizen
+//Returns true if there is zombie closer than 80 pixels
+bool locateNearestCitizenThreat(double citizen_x, double citizen_y, double& otherX, double& otherY, double& dist_z) const
+{
+    double dist;
+    dist_z=INT_MAX;
+    double x=INT_MAX, y=INT_MAX;
+    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        if((*it)->isZombie())
+        {
+            
+            x=(*it)->getX();
+            y=(*it)->getY();
+            
+            dist=(citizen_x-x)*(citizen_x-x)+(citizen_y-y)*(citizen_y-y);
+            if(distance>dist)
+            {
+                distance=dist;
+                target=(*it);
+                otherX=x;
+                otherY=y;
+            }
+        }
+    }
+    return dist_z<=6400;
+    
+}
+
 bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
 {
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if((*it)->blocksAgent() && checkOverlapByOneObject((*it), x, y));
+        if((*it)->blocksAgent() && checkOverlapByOneObject((*it), x, y && (*it)!=ag));
         {
             return true;
         }
