@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 
+using Direction=int;
 
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 Actor::Actor(StudentWorld* gw, int imageID, double startX, double startY,
@@ -526,14 +527,14 @@ bool Citizen::pickReverseDirection(double x, double y, double OtherX, double Oth
 {
     std::vector<Direction> temp;
     pickDirection(x, y, OtherX, OtherY,temp);
-    if(std::find(temp.begin(),temp.end(),left)!= temp.end())
-        direction_pool.push_back(right);
-    if(std::find(temp.begin(),temp.end(),right)== temp.end())
-        direction_pool.push_back(left);
-    if(std::find(temp.begin(),temp.end(),up)== temp.end())
-        direction_pool.push_back(down);
-    if(std::find(temp.begin(),temp.end(),down)== temp.end())
-        direction_pool.push_back(up);
+    if(std::find(temp.begin(),temp.end(),GraphObject::left)!= temp.end())
+        direction_pool.push_back(GraphObject::right);
+    if(std::find(temp.begin(),temp.end(),GraphObject::right)== temp.end())
+        direction_pool.push_back(GraphObject::left);
+    if(std::find(temp.begin(),temp.end(),GraphObject::up)== temp.end())
+        direction_pool.push_back(GraphObject::down);
+    if(std::find(temp.begin(),temp.end(),GraphObject::down)== temp.end())
+        direction_pool.push_back(GraphObject::up);
     return direction_pool.size()==1;
 }
 
@@ -732,21 +733,21 @@ Direction SmartZombie::pickDirection(double x, double y, double target_x, double
     
     if(d_x>0)
     {
-        direction_pool.push_back(right);
+        direction_pool.push_back(GraphObject::right);
     }
     
     else if(d_x<0)
     {
-        direction_pool.push_back(left);
+        direction_pool.push_back(GraphObject::left);
     }
     
     if(d_y>0)
     {
-        direction_pool.push_back(up);
+        direction_pool.push_back(GraphObject::up);
     }
     else if(d_y<0)
     {
-        direction_pool.push_back(down);
+        direction_pool.push_back(GraphObject::down);
     }
     
     if(direction_pool.size()==1)

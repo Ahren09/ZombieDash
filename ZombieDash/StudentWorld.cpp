@@ -35,16 +35,16 @@ bool determineNewPosition(Direction dir, double& x, double& y, double distance)
     
     switch(dir)
     {
-        case Actor::left:
+        case GraphObject::left:
             x-=distance;
             break;
-        case Actor::right:
+        case GraphObject::right:
             x+=distance;
             break;
-        case Actor::up:
+        case GraphObject::up:
             y+=distance;
             break;
-        case Actor::down:
+        case GraphObject::down:
             y-=distance;
             break;
     }
@@ -60,7 +60,7 @@ bool determineNewPosition(Direction dir, double& x, double& y, double distance)
 //Returns true otherwise, and set x,y to new values
 bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
 {
-    if( dir==Actor::left || dir == Actor::right )
+    if( dir==GraphObject::left || dir == GraphObject::right )
         return determineNewPosition(dir, x, y, SPRITE_WIDTH);
     else return determineNewPosition(dir, x, y, SPRITE_HEIGHT);
 }

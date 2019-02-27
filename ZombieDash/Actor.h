@@ -214,7 +214,6 @@ class VaccineGoodie: public Goodie
 public:
     VaccineGoodie(StudentWorld* gw, double startX, double startY);
     
-    void doSomething();
     void pickUp(Penelope* p);
     
 };
@@ -223,8 +222,7 @@ class GasCanGoodie: public Goodie
 {
 public:
     GasCanGoodie(StudentWorld* gw, double startX, double startY);
-    
-    void doSomething();
+   
     void pickUp(Penelope* p);
     
 };
@@ -234,7 +232,6 @@ class LandmineGoodie: public Goodie
 public:
     LandmineGoodie(StudentWorld* gw, double startX, double startY);
     
-    void doSomething();
     void pickUp(Penelope* p);
 };
 

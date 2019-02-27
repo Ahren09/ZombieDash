@@ -68,3 +68,27 @@ void activateOnAppropriateActors(Actor* a);
 
 
 I place all playSound() inside respective Actor class
+
+
+//###############
+If we define a virtual function inside a base class, we must provide an empty implementation 
+
+For example:
+virtual void activateIfAppropriate(Actor* a);
+
+If in some classes, we are not overriding activateIfAppropriate(), we can write:
+virtual void activateIfAppropriate(Actor* a){}
+inside base class
+
+//###############
+I define a doSomething() in Goodie class, which call their respective pickup(Penelope* p)
+
+When I compile, I got the error message:
+
+ "vtable for GasCanGoodie", referenced from:
+      GasCanGoodie::GasCanGoodie(StudentWorld*, double, double) in Actor.o
+  NOTE: a missing vtable usually means the first non-inline virtual member function has no definition.
+
+
+I should NOT declare doSomething() again if I am not to redefine doSomething() inside the 3 Goodie classes in Actor.h. Otherwise, the compiler expects that I provide a new implementation of doSomething(), which can NOT be empty.
+
