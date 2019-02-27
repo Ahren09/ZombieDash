@@ -67,7 +67,7 @@ public:
     // Does this object trigger landmines only when they're active?
     virtual bool triggersOnlyActiveLandmines() const;
     
-    virtual void isZombie()
+    virtual bool isZombie()
     { return true; }
     
     
@@ -119,6 +119,8 @@ class Exit: public ActivatingObject
 {
 public:
     Exit(StudentWorld* gw, double startX, double startY);
+    
+    //Checks whether there are Human Overlapping the Exit itself
     void doSomething();
     bool blocksFlame(Actor* flame) const
     { return true; }
@@ -135,12 +137,8 @@ class Pit: public ActivatingObject
 public:
     Pit(StudentWorld* gw, double startX, double startY);
     void doSomething();
-    virtual void activateIfAppropriate(Actor* a);
-    
     virtual bool canKillByFlame() const
     { return false; }
-    
-    //void killByPitIfAppropriate(Actor* a);
     
 };
 
@@ -149,7 +147,6 @@ class Flame: public ActivatingObject
 public:
     Flame(StudentWorld* gw, double startX, double startY, Direction dir);
     void doSomething();
-    virtual void activateIfAppropriate(Actor* a);
     int getCount()
     { return active_count; }
     void decCount()
@@ -271,6 +268,7 @@ public:
     virtual bool blocksAgent() const
     { return true; }
     
+    virtual bool
     
     
 };

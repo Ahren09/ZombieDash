@@ -231,18 +231,29 @@ bool StudentWorld::isFlameBlockedAt(double x, double y) const
     return flag;
 }
 
+
+
 void StudentWorld::killByFlameIfAppropriate(Flame* flame)
 {
+    if(checkOverlapByTwoObjects(flame, pene))
+        pene->dieByFallOrBurnIfAppropriate();
     for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-    {
         if((*it)->canKillByFlame() && checkOverlapByTwoObjects(flame, (*it)))
         {
-            (*it)->setDead();
-            
+            (*it)->dieByFallOrBurnIfAppropriate();
         }
-        
-    }
     
+}
+
+void StudentWorld::killByPitIfAppropriate(Pit* pit)
+{
+    if(checkOverlapByTwoObjects(pit, pene))
+        pene->dieByFallOrBurnIfAppropriate();
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+        if((*it)->canKillByPit() && checkOverlapByTwoObjects(pit, (*it)))
+        {
+            (*it)->dieByFallOrBurnIfAppropriate();
+        }
 }
 
 void StudentWorld::infectByVomitIfAppropriate(Vomit* vomit)
@@ -258,6 +269,15 @@ void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, dou
     if(!isFlameBlockedAt(x, y))
     {
         addActor(new Flame(this, x,y, Actor::up));
+    }
+}
+
+void StudentWorld::useExit(Exit* exit)
+{
+    pene->useExitIfAppropriate(exit);
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        (*it)->useExitIfAppropriate(exit);
     }
 }
 

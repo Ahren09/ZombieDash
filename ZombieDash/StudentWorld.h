@@ -38,7 +38,11 @@ public:
     void addActor(Actor* actor)
     { m_actors.push_back(actor); }
     
+    //Set all Actors burned by Flame to dead
     void killByFlameIfAppropriate(Flame* flame);
+    
+    //Set all Agent falling into Pit to dead
+    void killByPitIfAppropriate(Pit* pit);
     
     void increaseZombieCount()
     { zombie_count++; }
@@ -49,22 +53,7 @@ public:
     void decreaseCitizenCount()
     { citizen_count--; }
     
-    
-//    void killByLandmineIfAppropriate(Landmine* landmine)
-//    {
-//        for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-//        {
-//            if((*it)->canKillByLandmine() && checkOverlapByTwoObjects(landmine, (*it)))
-//            {
-//                
-//                landmine->explode((*it)->getDirection());
-//            }
-//        }
-//        
-//    }
-    
     void infectByVomitIfAppropriate(Vomit* vomit);
-    
     
     //Try to introduce a Flame object at specified xy location
     void introduceFlameIfAppropriate(Landmine* landmine, double x, double y, Direction dir);
@@ -116,6 +105,8 @@ public:
     
     //returns true if there is agent blocking ag
     bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;
+    
+    void useExit(Exit* exit);
     
     //Get Citizen's distance to Penelope, returns true if less than 80
     bool getPenelopeDist(double x, double y, double& p_x, double& p_y, double dist_p)

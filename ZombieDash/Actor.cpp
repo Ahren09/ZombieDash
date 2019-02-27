@@ -75,22 +75,12 @@ Exit::Exit(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_EXIT, startX, startY, right, 1)
 {}
 
+
+
 void Exit::doSomething()
 {
-    //TODO: get info about a citizen's successful escape
-    if(/* */)
-    {
-        getWorld()->increaseScore(500);
-        
-        getWorld()->playSound(SOUND_CITIZEN_SAVED);
-    }
-    
-    //TODO: all citizen saved and penelope escape
-    if(getWorld()->getCitizenCount()==0 && checkOverlapAnother(getWorld()->getPenelope()) )
-    {
-        getWorld()->
-        
-    }
+    getWorld()->useExit(this);
+    getWorld()->getPenelope()->useExitIfAppropriate(this);
 }
 
 Pit::Pit(StudentWorld* gw, double startX, double startY)
@@ -99,8 +89,7 @@ Pit::Pit(StudentWorld* gw, double startX, double startY)
 
 void Pit::doSomething()
 {
-    
-    
+    getWorld()->killByPitIfAppropriate(this);
 }
 
 void Pit::activateIfAppropriate(Actor* a)
@@ -333,15 +322,16 @@ void Human::doSomething()
 void Human::useExitIfAppropriate(Exit* exit)
 {
     if(getWorld()->checkOverlapByTwoObjects(this, exit))
-    { setDead(); }
+    {
+        setDead();
+        getWorld()->increaseScore(500);
+        getWorld()->playSound(SOUND_CITIZEN_SAVED);
+    }
 }
 
 Citizen::Citizen(StudentWorld* gw, double startX, double startY)
 :Human(gw, IID_CITIZEN, startX, startY)
-{
-    gw->
-    
-}
+{}
 
 void Citizen::useExitIfAppropriate(Exit* exit)
 {
