@@ -231,6 +231,14 @@ bool StudentWorld::isFlameBlockedAt(double x, double y) const
     return flag;
 }
 
+//
+void StudentWorld::activateOnAppropriateActors(Actor* a)
+{
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        a->activateIfAppropriate(*it);
+    }
+}
 
 
 void StudentWorld::killByFlameIfAppropriate(Flame* flame)
@@ -264,7 +272,7 @@ void StudentWorld::infectByVomitIfAppropriate(Vomit* vomit)
     }
 }
 
-void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, double y, Direction dir)
+void StudentWorld::introduceFlameIfAppropriate(double x, double y)
 {
     if(!isFlameBlockedAt(x, y))
     {
@@ -279,11 +287,6 @@ void StudentWorld::useExit(Exit* exit)
     {
         (*it)->useExitIfAppropriate(exit);
     }
-}
-
-void StudentWorld::introduceFlameIfAppropriate(Landmine* landmine, double x, double y)
-{
-    if(getNewPositionWithDir(up, <#double &x#>, <#double &y#>))
 }
 
 bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance)

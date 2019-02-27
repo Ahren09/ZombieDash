@@ -38,6 +38,9 @@ public:
     void addActor(Actor* actor)
     { m_actors.push_back(actor); }
     
+    // For each actor overlapping a, activate a if appropriate.
+    void activateOnAppropriateActors(Actor* a);
+    
     //Set all Actors burned by Flame to dead
     void killByFlameIfAppropriate(Flame* flame);
     
@@ -56,8 +59,7 @@ public:
     void infectByVomitIfAppropriate(Vomit* vomit);
     
     //Try to introduce a Flame object at specified xy location
-    void introduceFlameIfAppropriate(Landmine* landmine, double x, double y, Direction dir);
-    
+    void introduceFlameIfAppropriate(double x, double y);
     
     // Is creation of a flame blocked at the indicated location?
     bool isFlameBlockedAt(double x, double y) const;

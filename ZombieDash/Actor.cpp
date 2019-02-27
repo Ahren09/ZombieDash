@@ -111,7 +111,7 @@ void Flame::doSomething()
     if(getCount()>0)
     {
         decCount();
-        getWorld()->killByFlameIfAppropriate(this);
+        getWorld()->activateOnAppropriateActors(this);
     }
     
     else setDead();
@@ -122,7 +122,6 @@ void Flame::activateIfAppropriate(Actor* a)
 {
     if(a->canKillByFlame() && getWorld()-> checkOverlapByTwoObjects(this, a))
     {
-        a->setDead();
         a->dieByFallOrBurnIfAppropriate();
     }
 }
@@ -136,16 +135,15 @@ active_count(2)
 void Vomit::doSomething()
 {
     if(getCount()>0)
-        
     {
         decCount();
-        getWorld()->infectByVomitIfAppropriate(this);
+        getWorld()->activateOnAppropriateActors(this);
     }
     else setDead();
 }
 
 //Set Agents that overlap with Flame to dead
-void Vomit::infectByVomitIfAppropriate(Actor *a)
+void Vomit::activateIfAppropriate(Actor *a)
 {
     if(a->canInfectByVomit() && getWorld()->checkOverlapByTwoObjects(this, a))
     {
@@ -164,7 +162,7 @@ void Landmine::doSomething()
     //IF Landmine is activated
     if(activationCountDown())
     {
-        
+        getWorld()->activateOnAppropriateActors(this);
         
     }
 }
@@ -174,14 +172,14 @@ void Landmine::activateIfAppropriate(Actor* a)
     
     if(getWorld()->checkOverlapByTwoObjects(this, a))
     {
-        //TODO: generate flame and pit
+        dieByFallOrBurnIfAppropriate();
     }
     
 }
 
 
 //Introduce surrounding flames and create pit
-void Landmine::explode()
+void Landmine::dieByFallOrBurnIfAppropriate()
 {
     getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
     int x=getX();
@@ -200,12 +198,11 @@ void Landmine::explode()
     getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y-SPRITE_HEIGHT, up);
     
     //Introduce a pit at location of Landmine;
-    getWorld()->introducePitIfAppropriate(this, x, y);
+    getWorld()->addActor(new Pit(getWorld(),x,y));
     
     //Set status to dead
     setDead();
 }
-
 
 
 
@@ -221,11 +218,9 @@ Goodie::Goodie(StudentWorld* gw, int imageID, double startX, double startY)
 :ActivatingObject(gw, imageID, startX, startY, right, 1)
 {}
 
+//Goodies can only be accessed by Penelope
 void Goodie::activateIfAppropriate(Actor *a)
-{
-    
-    
-}
+{}
 
 void Goodie::pickUp(Penelope *p)
 {
@@ -236,6 +231,7 @@ void Goodie::pickUp(Penelope *p)
 
 void Goodie::doSomething()
 {
+    getWorld()->activateOnAppropriateActors(this);
     Penelope* p = getWorld()->getPenelope();
     if(getWorld()->checkOverlapByTwoObjects(this, p))
     {
@@ -250,13 +246,7 @@ VaccineGoodie::VaccineGoodie(StudentWorld* gw, double startX, double startY)
 void VaccineGoodie::pickUp(Penelope *p)
 {
     Goodie::pickUp(p);
-    getWorld()->getPenelope()->increaseVaccines();
-}
-
-void VaccineGoodie::doSomething()
-{
-    Goodie::doSomething();
-    getWorld()->getPenelope()->increaseVaccines();
+    p->increaseVaccines();
 }
 
 GasCanGoodie::GasCanGoodie(StudentWorld* gw, double startX, double startY)
@@ -266,13 +256,7 @@ GasCanGoodie::GasCanGoodie(StudentWorld* gw, double startX, double startY)
 void GasCanGoodie::pickUp(Penelope *p)
 {
     Goodie::pickUp(p);
-    getWorld()->getPenelope()->increaseFlameCharges();
-}
-
-void GasCanGoodie::doSomething()
-{
-    Goodie::doSomething();
-    getWorld()->getPenelope()->increaseFlameCharges();
+    p->increaseFlameCharges();
 }
 
 LandmineGoodie::LandmineGoodie(StudentWorld* gw, double startX, double startY)
@@ -282,14 +266,8 @@ LandmineGoodie::LandmineGoodie(StudentWorld* gw, double startX, double startY)
 void LandmineGoodie::pickUp(Penelope *p)
 {
     Goodie::pickUp(p);
-    getWorld()->getPenelope()->increaseLandmines();
+    p->increaseLandmines();
 }
-void LandmineGoodie::doSomething()
-{
-    Goodie::doSomething();
-    
-}
-
 
 //##########################
 // MARK: - Agent

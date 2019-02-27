@@ -137,6 +137,7 @@ class Pit: public ActivatingObject
 public:
     Pit(StudentWorld* gw, double startX, double startY);
     void doSomething();
+    void activateIfAppropriate(Actor* a);
     virtual bool canKillByFlame() const
     { return false; }
     
@@ -147,6 +148,7 @@ class Flame: public ActivatingObject
 public:
     Flame(StudentWorld* gw, double startX, double startY, Direction dir);
     void doSomething();
+    void activateIfAppropriate(Actor* a);
     int getCount()
     { return active_count; }
     void decCount()
@@ -166,7 +168,7 @@ public:
     Vomit(StudentWorld* gw, double startX, double startY, Direction dir);
    
     void doSomething();
-    virtual void activateIfAppropriate(Actor* a);
+    void activateIfAppropriate(Actor* a);
     int getCount()
     { return active_count; }
     void decCount()
@@ -186,7 +188,6 @@ public:
     
     void doSomething();
     virtual void activateIfAppropriate(Actor* a);
-    void explode();
     virtual void dieByFallOrBurnIfAppropriate(); //Can call explode()
     
 private:

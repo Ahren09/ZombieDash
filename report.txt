@@ -53,3 +53,15 @@ Format of using a reference to a pointer
 '*' should be placed before '&'
 For example, if we are to declare an Actor pointer:
 	Actor* &a
+
+//###############
+About Consolidating functions
+//Set all Actors burned by Flame to dead
+void killByFlameIfAppropriate(Flame* flame);
+    
+//Set all Agent falling into Pit to dead
+void killByPitIfAppropriate(Pit* pit);
+
+
+Since they all operate on StudentWorld class,
+void activateOnAppropriateActors(Actor* a);
