@@ -18,16 +18,16 @@ GameWorld* createStudentWorld(string assetPath)
 // Students:  Add code to this file, StudentWorld.h, Actor.h and Actor.cpp
 
 StudentWorld::StudentWorld(string assetPath)
-: GameWorld(assetPath)
+: GameWorld(assetPath),gameFinished(false)
 {
     citizen_count=0;
     zombie_count=0;
+    infect_count=0;
 }
 
 StudentWorld::~StudentWorld()
 {
     cleanUp();
-    
 }
 
 
@@ -47,7 +47,6 @@ int StudentWorld::init()
    
     oss<<".txt";
     string levelFile=oss.str();
-    
     Level::LoadResult result=lev.loadLevel(levelFile);
     if(result == Level::load_fail_file_not_found)
         cerr<<"Cannot find level01.txt data file"<<endl;
@@ -110,13 +109,14 @@ int StudentWorld::init()
                     case Level::dumb_zombie:{
                         Actor* actor = new DumbZombie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
+                        zombie_count++;
                         
                     }break;
                         
                     case Level::smart_zombie:{
                         Actor* actor = new SmartZombie(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
-                        
+                        zombie_count++;
                     }break;
                         
                     
@@ -142,7 +142,7 @@ int StudentWorld::init()
 int StudentWorld::move()
 {
     updateTick();
-    
+    writeStatus();
     //move all Actors in a for-loop
     if(getLives()>0)
         pene->doSomething();
@@ -157,15 +157,15 @@ int StudentWorld::move()
             return GWSTATUS_PLAYER_DIED;
         }
         
-        
-         //if citizen Penelope has escaped
-         if(gameFinished)
-         {
-             playSound(SOUND_LEVEL_FINISHED);
-             return GWSTATUS_FINISHED_LEVEL;
-         }
-        
     }
+    
+    //if citizen Penelope has escaped
+    if(citizen_count==0 && gameFinished)
+    {
+        playSound(SOUND_LEVEL_FINISHED);
+        return GWSTATUS_FINISHED_LEVEL;
+    }
+    
     for(list<Actor*>::iterator it=m_actors.begin(); it!=m_actors.end(); it++)
     {
         //Actor dies
@@ -310,6 +310,38 @@ bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
         }
     }
     return false;
+    
+}
+
+void StudentWorld::writeStatus()
+{
+    //eg: Score: 004500 Level: 27 Lives: 3 Vaccines: 2 Flames: 16 Mines: 1 Infected: 0
+    ostringstream oss;
+    
+    //Display Score
+    oss<<"Score: ";
+    oss.fill('0');
+    oss<<setw(6)<<getScore()<<"  ";
+    
+    //Display Level
+    oss<<"Level:  "<<getLevel()<<"  ";
+    
+    //Display Lives
+    oss<<"Lives:  "<<getLives()<<"  ";
+    
+    //Display Vaccines
+    oss<<"Vaccines:  "<<pene->getNumVaccines()<<"  ";
+    
+    //Display Flames
+    oss<<"Flames:  "<<pene->getNumFlameCharges()<<"  ";
+    
+    //Display Mines
+    oss<<"Mines:  "<<pene->getNumLandmines()<<"  ";
+    
+    //Display Number of infected citizens
+    oss<<"Infected: "<<infect_count;
+    
+    setGameStatText(oss.str());
     
 }
 

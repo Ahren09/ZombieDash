@@ -92,3 +92,7 @@ When I compile, I got the error message:
 
 I should NOT declare doSomething() again if I am not to redefine doSomething() inside the 3 Goodie classes in Actor.h. Otherwise, the compiler expects that I provide a new implementation of doSomething(), which can NOT be empty.
 
+
+//###############
+
+I used a vector to score the potential direction of Agents

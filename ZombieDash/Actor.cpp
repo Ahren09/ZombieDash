@@ -57,7 +57,7 @@ bool Actor::determineNewPosition(Direction dir, double& x, double& y, double dis
     bool X_OutOfBound = x<0 || x >= VIEW_WIDTH;
     bool Y_OutOfBound = y<0 || y >= VIEW_HEIGHT;
     
-    return X_OutOfBound || Y_OutOfBound;
+    return !X_OutOfBound && !Y_OutOfBound;
     
 }
 
@@ -178,6 +178,7 @@ void Vomit::activateIfAppropriate(Actor *a)
     if(a->canInfectByVomit() && getWorld()->checkOverlapByTwoObjects(this, a))
     {
         a->setInfectionStatus();
+        getWorld()->increaseInfectCount();
     }
 }
 

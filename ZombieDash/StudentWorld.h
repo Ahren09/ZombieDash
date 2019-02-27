@@ -42,6 +42,8 @@ public:
     // For each actor overlapping a, activate a if appropriate.
     void activateOnAppropriateActors(Actor* a);
     
+    void increaseInfectCount()
+    { infect_count++; }
     
     void increaseZombieCount()
     { zombie_count++; }
@@ -110,6 +112,7 @@ public:
         return dist_p<=6400;
     }
     
+    void writeStatus();
     
    
     
@@ -118,6 +121,7 @@ private:
     int citizen_count;
     int zombie_count;
     Penelope* pene;
+    int infect_count;
     
     bool gameFinished;
     

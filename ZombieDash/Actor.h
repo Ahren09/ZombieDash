@@ -301,12 +301,11 @@ public:
     Penelope(StudentWorld* gw, double startX, double startY);
     
     virtual void doSomething();
-    void fire(Direction dir); //Fire flame
     void moveToPosition(double x, double y, Direction dir);
     
     virtual void dieByFallOrBurnIfAppropriate();
     
-    // virtual void pickUpGoodieIfAppropriate(Goodie* g);
+   
     
     // Increase the number of vaccines the object has.
     void increaseVaccines()
@@ -324,9 +323,9 @@ public:
     int getNumVaccines() const
     { return vaccine_count; }
     
-//    // How many flame charges does the object have?
-//    int getNumFlameCharges() const
-//    { return flame_count; }
+    // How many flame charges does the object have?
+    int getNumFlameCharges() const
+    { return flame_count; }
     
     // How many landmines does the object have?
     int getNumLandmines() const
