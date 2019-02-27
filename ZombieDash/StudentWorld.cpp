@@ -30,40 +30,8 @@ StudentWorld::~StudentWorld()
     
 }
 
-bool determineNewPosition(Direction dir, double& x, double& y, double distance)
-{
-    
-    switch(dir)
-    {
-        case GraphObject::left:
-            x-=distance;
-            break;
-        case GraphObject::right:
-            x+=distance;
-            break;
-        case GraphObject::up:
-            y+=distance;
-            break;
-        case GraphObject::down:
-            y-=distance;
-            break;
-    }
-    bool X_OutOfBound = x<0 || x >= VIEW_WIDTH;
-    bool Y_OutOfBound = y<0 || y >= VIEW_HEIGHT;
-    
-    return X_OutOfBound || Y_OutOfBound;
-    
-}
 
-//Check whether the new location is still in StudentWorld
-//Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
-//Returns true otherwise, and set x,y to new values
-bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
-{
-    if( dir==GraphObject::left || dir == GraphObject::right )
-        return determineNewPosition(dir, x, y, SPRITE_WIDTH);
-    else return determineNewPosition(dir, x, y, SPRITE_HEIGHT);
-}
+
 
 
 int StudentWorld::init()

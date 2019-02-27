@@ -64,6 +64,13 @@ public:
     
     virtual bool isZombie()
     { return true; }
+    
+    bool determineNewPosition(Direction dir, double& x, double& y, double distance);
+    
+    //Check whether the new location is still in StudentWorld
+    //Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
+    //Returns true otherwise, and set x,y to new values
+    bool getNewPositionWithDir(Direction dir, double& x, double& y);
 
     Direction getDirectionByNum(int n);
 private:

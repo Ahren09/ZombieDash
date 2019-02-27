@@ -78,8 +78,6 @@ public:
     bool checkOverlapByTwoObjects(Actor* me, Actor* other) const
     {  return checkOverlap(me->getX(),me->getY(), other->getX(), other->getY()); }
     
-    bool getNewPositionWithDir(Direction dir, double& x, double& y);
-    
     bool checkValidPosition(double& x, double& y)
     { return x>=0 && y>=0 && x<VIEW_WIDTH && VIEW_HEIGHT; }
     
@@ -97,7 +95,6 @@ public:
     
     bool locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance);
     
-    bool determineNewPosition(Direction dir, double& x, double& y, double distance);
     
     //returns true if there is agent blocking ag
     bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;

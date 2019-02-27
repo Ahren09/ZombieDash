@@ -36,6 +36,43 @@ Direction Actor::getDirectionByNum(int n)
     
 }
 
+bool Actor::determineNewPosition(Direction dir, double& x, double& y, double distance)
+{
+    
+    switch(dir)
+    {
+        case left:
+            x-=distance;
+            break;
+        case right:
+            x+=distance;
+            break;
+        case up:
+            y+=distance;
+            break;
+        case down:
+            y-=distance;
+            break;
+    }
+    bool X_OutOfBound = x<0 || x >= VIEW_WIDTH;
+    bool Y_OutOfBound = y<0 || y >= VIEW_HEIGHT;
+    
+    return X_OutOfBound || Y_OutOfBound;
+    
+}
+
+//Check whether the new location is still in StudentWorld
+//Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
+//Returns true otherwise, and set x,y to new values
+bool Actor::getNewPositionWithDir(Direction dir, double& x, double& y)
+{
+    if( dir==left || dir == right )
+        return determineNewPosition(dir, x, y, SPRITE_WIDTH);
+    else return determineNewPosition(dir, x, y, SPRITE_HEIGHT);
+}
+
+
+
 //Mark: Wall
 
 Wall::Wall(StudentWorld* gw, double startX, double startY)
@@ -346,7 +383,7 @@ void Penelope::moveToPosition(double x, double y, Direction dir)
 {
     setDirection(dir);
     //IF new position is valid, i.e. within StudentWorld
-    if(getWorld()->determineNewPosition(dir, x, y, 4))
+    if(determineNewPosition(dir, x, y, 4))
     {
         if(!getWorld()->isAgentMovementBlockedAt(this, x, y))
         {
@@ -372,7 +409,7 @@ void Penelope::fireGasCan()
     for(int i=0;i<3;i++)
     {
         //IF position of the flame is valid
-        if(getWorld()->getNewPositionWithDir(dir, flame_x, flame_y))
+        if(getNewPositionWithDir(dir, flame_x, flame_y))
         {
             //No Exits or Walls block the flame
             if(!getWorld()->isFlameBlockedAt(flame_x, flame_y))
@@ -479,7 +516,7 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
     if(oneMove)
     {
         d=getDirectionByNum(direction_pool[0]);
-        getWorld()->determineNewPosition(d, new_x, new_y, 2);
+        determineNewPosition(d, new_x, new_y, 2);
         //Not blocked
         successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
         if(successfulMove)
@@ -494,7 +531,7 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
         else if(!oneMove)
         {
             d=getDirectionByNum(direction_pool[1]);
-            getWorld()->determineNewPosition(d, new_x, new_y, 2);
+            determineNewPosition(d, new_x, new_y, 2);
             //Not blocked
             successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
             if(successfulMove)
@@ -521,7 +558,7 @@ bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
     if(oneMove)
     {
         Direction d1=getDirectionByNum(direction_pool[0]);
-        getWorld()->determineNewPosition(d1, new_x, new_y, 2);
+        determineNewPosition(d1, new_x, new_y, 2);
         //Not blocked
         successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
         if(successfulMove)
@@ -534,7 +571,7 @@ bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
         else if(!oneMove)
         {
             Direction d2=getDirectionByNum(direction_pool[1]);
-            getWorld()->determineNewPosition(d2, new_x, new_y, 2);
+            determineNewPosition(d2, new_x, new_y, 2);
             //Not blocked
             successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
             if(successfulMove)
@@ -654,7 +691,7 @@ void Zombie::moveToNewPosition()
     double x=getX(), y=getY();
     
     //if the new position is valid
-    if(getWorld()->determineNewPosition(dir, x, y, 1))
+    if(determineNewPosition(dir, x, y, 1))
     {
         if(!getWorld()->isAgentMovementBlockedAt(this,x,y))
         {
