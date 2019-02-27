@@ -14,40 +14,6 @@ m_world(gw),aliveStatus(true)
 {};
 
 
-
-//Move to 4 directions
-void Actor::moveUp()
-{
-    setDirection(up);
-    if(!getWorld()->checkAllOverlap(this,getX(),getY()+4))
-        moveTo(getX(),getY()+4);
-    
-}
-
-void Actor::moveDown()
-{
-    setDirection(down);
-    if(!getWorld()->checkAllOverlap(this,getX(),getY()-4))
-        moveTo(getX(),getY()-4);
-    
-}
-
-void Actor::moveLeft()
-{
-    setDirection(left);
-    if(!getWorld()->checkAllOverlap(this,getX()-4,getY()))
-        moveTo(getX()-4,getY());
-    
-}
-
-void Actor::moveRight()
-{
-    setDirection(right);
-    if(!getWorld()->checkAllOverlap(this,getX()+4,getY()))
-        moveTo(getX()+4,getY());
-    
-}
-
 //Mark: Wall
 
 Wall::Wall(StudentWorld* gw, double startX, double startY)
@@ -66,10 +32,7 @@ void Wall::doSomething(){};
 
 ActivatingObject::ActivatingObject(StudentWorld* gw, int id, double startX, double startY, Direction dir, int depth)
 :Actor(gw, id, startX, startY, dir, depth)
-{
-    
-    
-}
+{}
 
 Exit::Exit(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_EXIT, startX, startY, right, 1)
@@ -83,13 +46,21 @@ void Exit::doSomething()
     getWorld()->getPenelope()->useExitIfAppropriate(this);
 }
 
+//void Exit::activateIfAppropriate(Actor* a)
+//{
+//    if(getWorld()->checkOverlapByTwoObjects(this, a) )
+//    {
+//        a->setDead();
+//    }
+//}
+
 Pit::Pit(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_PIT, startX, startY, right, 0)
 {}
 
 void Pit::doSomething()
 {
-    getWorld()->killByPitIfAppropriate(this);
+    getWorld()->activateOnAppropriateActors(this);
 }
 
 void Pit::activateIfAppropriate(Actor* a)
@@ -187,15 +158,15 @@ void Landmine::dieByFallOrBurnIfAppropriate()
     
     
     //Introduce surrounding flame objects
-    getWorld()->introduceFlameIfAppropriate(this, x, y, up);
-    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y, up);
-    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y, up);
-    getWorld()->introduceFlameIfAppropriate(this, x, y+SPRITE_HEIGHT, up);
-    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y+SPRITE_HEIGHT, up);
-    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y+SPRITE_HEIGHT, up);
-    getWorld()->introduceFlameIfAppropriate(this, x, y-SPRITE_HEIGHT, up);
-    getWorld()->introduceFlameIfAppropriate(this, x+SPRITE_WIDTH, y-SPRITE_HEIGHT, up);
-    getWorld()->introduceFlameIfAppropriate(this, x-SPRITE_WIDTH, y-SPRITE_HEIGHT, up);
+    getWorld()->introduceFlameIfAppropriate(x, y);
+    getWorld()->introduceFlameIfAppropriate(x+SPRITE_WIDTH, y);
+    getWorld()->introduceFlameIfAppropriate(x-SPRITE_WIDTH, y);
+    getWorld()->introduceFlameIfAppropriate(x, y+SPRITE_HEIGHT);
+    getWorld()->introduceFlameIfAppropriate(x+SPRITE_WIDTH, y+SPRITE_HEIGHT);
+    getWorld()->introduceFlameIfAppropriate(x-SPRITE_WIDTH, y+SPRITE_HEIGHT);
+    getWorld()->introduceFlameIfAppropriate(x, y-SPRITE_HEIGHT);
+    getWorld()->introduceFlameIfAppropriate(x+SPRITE_WIDTH, y-SPRITE_HEIGHT);
+    getWorld()->introduceFlameIfAppropriate(x-SPRITE_WIDTH, y-SPRITE_HEIGHT);
     
     //Introduce a pit at location of Landmine;
     getWorld()->addActor(new Pit(getWorld(),x,y));
@@ -203,10 +174,6 @@ void Landmine::dieByFallOrBurnIfAppropriate()
     //Set status to dead
     setDead();
 }
-
-
-
-
 
 
 
@@ -231,7 +198,7 @@ void Goodie::pickUp(Penelope *p)
 
 void Goodie::doSomething()
 {
-    getWorld()->activateOnAppropriateActors(this);
+    //getWorld()->activateOnAppropriateActors(this);
     Penelope* p = getWorld()->getPenelope();
     if(getWorld()->checkOverlapByTwoObjects(this, p))
     {
@@ -275,10 +242,7 @@ void LandmineGoodie::pickUp(Penelope *p)
 
 Agent::Agent(StudentWorld* gw, int imageID, double startX, double startY)
 :Actor(gw, imageID, startX, startY, right, 0)
-{
-    
-    
-}
+{}
 
 //*************
 // MARK: Human
@@ -292,31 +256,12 @@ void Human::doSomething()
     if(getInfectedStatus())
     {
         infectionCount++;
-        if(getInfectionCount()>=500)
-            setDead();
+        
     }
 }
 
 void Human::useExitIfAppropriate(Exit* exit)
 {
-    if(getWorld()->checkOverlapByTwoObjects(this, exit))
-    {
-        setDead();
-        getWorld()->increaseScore(500);
-        getWorld()->playSound(SOUND_CITIZEN_SAVED);
-    }
-}
-
-Citizen::Citizen(StudentWorld* gw, double startX, double startY)
-:Human(gw, IID_CITIZEN, startX, startY)
-{}
-
-void Citizen::useExitIfAppropriate(Exit* exit)
-{
-    Human::useExitIfAppropriate(exit);
-    getWorld()->increaseScore(500);
-    getWorld()->playSound(SOUND_CITIZEN_SAVED);
-    getWorld()->recordCitizenGone();
 }
 
 Penelope::Penelope(StudentWorld* gw, double startX, double startY)
@@ -328,43 +273,62 @@ void Penelope::doSomething()
 {
     //If infection Count reach the threshold
     Human::doSomething();
-
-    
-    
+    if(getInfectionCount()>=500)
+    {
+        setDead();
+        getWorld()->playSound(SOUND_PLAYER_DIE);
+        return;
+    }
     
     int ch;
     if(getWorld()->getKey(ch))
     {
         switch(ch){
-                
-                //move actions
+            //move actions
             case KEY_PRESS_UP:
-                moveUp();
+                moveToPosition(getX(), getY(), up);
                 break;
             case KEY_PRESS_DOWN:
-                moveDown();
+                moveToPosition(getX(), getY(), down);
                 break;
                 
             case KEY_PRESS_LEFT:
-                moveLeft();
+                moveToPosition(getX(), getY(), left);
                 break;
                 
             case KEY_PRESS_RIGHT:
-                moveRight();
+                moveToPosition(getX(), getY(), right);
                 break;
+            
+            //Perform actions
             case KEY_PRESS_TAB:
-                //TODO:
-                 break;
+                useLandmine();
+                break;
                 
             case KEY_PRESS_SPACE:
-                //TODO:
+                if(flame_count>0)
+                {
+                    fireGasCan();
+                    flame_count--;
+                }
                 break;
                 
             case KEY_PRESS_ENTER:
-                //TODO:
+                useVaccine();
                 break;
-                
-                
+        }
+    }
+}
+
+void Penelope::moveToPosition(double x, double y, Direction dir)
+{
+    setDirection(dir);
+    //IF new position is valid, i.e. within StudentWorld
+    if(getWorld()->determineNewPosition(dir, x, y, 4))
+    {
+        if(!getWorld()->isAgentMovementBlockedAt(this, x, y))
+        {
+            moveTo(x, y);
         }
     }
 }
@@ -403,7 +367,9 @@ void Penelope::fireGasCan()
 
 void Penelope::useLandmine()
 {
+    if(mine_count>0)
     getWorld()->addActor(new Landmine(getWorld(),getX(),getY()));
+    mine_count--;
 }
 
 void Penelope::useExitIfAppropriate(Exit* exit)
@@ -417,6 +383,27 @@ void Penelope::useExitIfAppropriate(Exit* exit)
     }
 }
 
+void Penelope::dieByFallOrBurnIfAppropriate()
+{
+    setDead();
+    getWorld()->playSound(SOUND_PLAYER_DIE);
+}
+
+Citizen::Citizen(StudentWorld* gw, double startX, double startY)
+:Human(gw, IID_CITIZEN, startX, startY)
+{}
+
+void Citizen::useExitIfAppropriate(Exit* exit)
+{
+    if(getWorld()->checkOverlapByTwoObjects(this, exit))
+    {
+        setDead();
+        getWorld()->increaseScore(500);
+        getWorld()->playSound(SOUND_CITIZEN_SAVED);
+    }
+    getWorld()->recordCitizenGone();
+}
+
 void Citizen::dieByFallOrBurnIfAppropriate()
 {
     setDead();
@@ -424,9 +411,6 @@ void Citizen::dieByFallOrBurnIfAppropriate()
     getWorld()->increaseScore(-1000);
 }
 
-
-    
-    
 void Citizen::doSomething()
 {
     if(getWorld()->checkTick())
@@ -435,8 +419,9 @@ void Citizen::doSomething()
     Human::doSomething();
     if(!isAlive())
     {
-        //TODO: Check Alive
+        return;
     }
+    
     double zombie_x, zombie_y, dist_z, dist_p;
     double p_x, p_y;
     
@@ -576,7 +561,7 @@ bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std
         direction_pool.push_back(down);
     }
     
-    else return direction_pool.size()==1;
+    return direction_pool.size()==1;
     
 }
 
@@ -584,14 +569,14 @@ bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std
 //Citizen die when infection count reaches 500
 void Citizen::turnIntoZombie()
 {
+    StudentWorld* gw=getWorld();
     setDead();
-    getWorld()->increaseScore(-1000);
-    getWorld()->playSound(SOUND_ZOMBIE_BORN);
+    gw->increaseScore(-1000);
+    gw->playSound(SOUND_ZOMBIE_BORN);
     int randnum=randInt(1, 10);
     if(randnum>0 && randnum<=3)
-        getWorld()->addActor(new SmartZombie(gw, getX(),getY(),getDirection()));
-    else getWorld()->addActor(new DumbZombie(gw, getX(),getY(),getDirection()));
-    
+        gw->addActor(new SmartZombie(gw, getX(),getY()));
+    else getWorld()->addActor(new DumbZombie(gw, getX(),getY()));
 }
     
     
@@ -713,6 +698,13 @@ void DumbZombie::dropVaccineByChance(const double x, const double y)
     }
 }
 
+void DumbZombie::dieByFallOrBurnIfAppropriate()
+{
+    Zombie::dieByFallOrBurnIfAppropriate();
+    getWorld()->increaseScore(1000);
+    dropVaccineByChance(getX(), getY());
+}
+
 
 SmartZombie::SmartZombie(StudentWorld* gw, double startX, double startY)
 :Zombie(gw, startX, startY)
@@ -763,4 +755,10 @@ Direction SmartZombie::pickDirection(double x, double y, double target_x, double
     }
     else return direction_pool[randInt(0,1)];
     
+}
+
+void SmartZombie::dieByFallOrBurnIfAppropriate()
+{
+    Zombie::dieByFallOrBurnIfAppropriate();
+    getWorld()->increaseScore(2000);
 }

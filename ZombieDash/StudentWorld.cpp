@@ -30,7 +30,7 @@ StudentWorld::~StudentWorld()
     
 }
 
-bool determineNewPosition(Direction dir, double x, double y, double distance)
+bool determineNewPosition(Direction dir, double& x, double& y, double distance)
 {
     
     switch(dir)
@@ -186,7 +186,6 @@ int StudentWorld::move()
         //Penelope dies
         if(getLives()==0)
         {
-            playSound(SOUND_PLAYER_DIE);
             return GWSTATUS_PLAYER_DIED;
         }
         
@@ -240,38 +239,6 @@ void StudentWorld::activateOnAppropriateActors(Actor* a)
     }
 }
 
-
-void StudentWorld::killByFlameIfAppropriate(Flame* flame)
-{
-    if(checkOverlapByTwoObjects(flame, pene))
-        pene->dieByFallOrBurnIfAppropriate();
-    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-        if((*it)->canKillByFlame() && checkOverlapByTwoObjects(flame, (*it)))
-        {
-            (*it)->dieByFallOrBurnIfAppropriate();
-        }
-    
-}
-
-void StudentWorld::killByPitIfAppropriate(Pit* pit)
-{
-    if(checkOverlapByTwoObjects(pit, pene))
-        pene->dieByFallOrBurnIfAppropriate();
-    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-        if((*it)->canKillByPit() && checkOverlapByTwoObjects(pit, (*it)))
-        {
-            (*it)->dieByFallOrBurnIfAppropriate();
-        }
-}
-
-void StudentWorld::infectByVomitIfAppropriate(Vomit* vomit)
-{
-    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-    {
-        vomit->infectByVomitIfAppropriate(*it);
-    }
-}
-
 void StudentWorld::introduceFlameIfAppropriate(double x, double y)
 {
     if(!isFlameBlockedAt(x, y))
@@ -293,7 +260,7 @@ bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target,
 {
     double dist;
     distance=INT_MAX;
-    double target_x,target_y;
+    double target_x=INT_MAX,target_y=INT_MAX;
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
         if((*it)->canInfectByVomit())
@@ -339,12 +306,12 @@ bool StudentWorld::locateNearestCitizenTrigger(double zombie_x, double zombie_y,
 //Locate nearest Zombie to the Citizen
 //Called by Citizen
 //Returns true if there is zombie closer than 80 pixels
-bool locateNearestCitizenThreat(double citizen_x, double citizen_y, double& otherX, double& otherY, double& dist_z) const
+bool StudentWorld::locateNearestCitizenThreat(double citizen_x, double citizen_y, double& otherX, double& otherY, double& dist_z)
 {
     double dist;
     dist_z=INT_MAX;
     double x=INT_MAX, y=INT_MAX;
-    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
         if((*it)->isZombie())
         {
@@ -352,11 +319,10 @@ bool locateNearestCitizenThreat(double citizen_x, double citizen_y, double& othe
             x=(*it)->getX();
             y=(*it)->getY();
             
-            dist=(citizen_x-x)*(citizen_x-x)+(citizen_y-y)*(citizen_y-y);
-            if(distance>dist)
+            double distance=(citizen_x-x)*(citizen_x-x)+(citizen_y-y)*(citizen_y-y);
+            if(distance<dist)
             {
-                distance=dist;
-                target=(*it);
+                dist_z=distance;
                 otherX=x;
                 otherY=y;
             }
@@ -370,7 +336,7 @@ bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
 {
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if((*it)->blocksAgent() && checkOverlapByOneObject((*it), x, y && (*it)!=ag));
+        if((*it)->blocksAgent() && checkOverlapByOneObject(x, y,(*it)) && (*it)!=ag)
         {
             return true;
         }

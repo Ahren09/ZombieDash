@@ -32,6 +32,7 @@ public:
     
     void recordCitizenGone()
     { citizen_count--; }
+    
     Penelope* getPenelope() const
     { return pene; }
     
@@ -41,11 +42,6 @@ public:
     // For each actor overlapping a, activate a if appropriate.
     void activateOnAppropriateActors(Actor* a);
     
-    //Set all Actors burned by Flame to dead
-    void killByFlameIfAppropriate(Flame* flame);
-    
-    //Set all Agent falling into Pit to dead
-    void killByPitIfAppropriate(Pit* pit);
     
     void increaseZombieCount()
     { zombie_count++; }
@@ -55,8 +51,6 @@ public:
     
     void decreaseCitizenCount()
     { citizen_count--; }
-    
-    void infectByVomitIfAppropriate(Vomit* vomit);
     
     //Try to introduce a Flame object at specified xy location
     void introduceFlameIfAppropriate(double x, double y);
@@ -94,16 +88,16 @@ public:
     bool checkTick() const
     { return isEvenTick; }
     
-    bool updateTick()
-    {   isEvenTick = !isEvenTick; }
+    void updateTick()
+    {  isEvenTick = !isEvenTick; }
     
     bool locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance);
     
     bool locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const;
     
-    bool locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance) const;
+    bool locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance);
     
-    bool determineNewPosition(Direction dir, double x, double y, double distance);
+    bool determineNewPosition(Direction dir, double& x, double& y, double distance);
     
     //returns true if there is agent blocking ag
     bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;

@@ -26,22 +26,17 @@ public:
     
     // If this is an activated object, perform its effect on a (e.g., for an
     // Exit have a use the exit).
-    virtual void activateIfAppropriate(Actor* a);
+    virtual void activateIfAppropriate(Actor* a){}
     
     // If this object uses exits, use the exit.
     virtual void useExitIfAppropriate(Exit* exit){}
     
     // If this object can die by falling into a pit or burning, die.
-    virtual void dieByFallOrBurnIfAppropriate();
-    
-    // If this object can be infected by vomit, get infected.
-    virtual void beVomitedOnIfAppropriate();
-    
-    // If this object can pick up goodies, pick up g
-    virtual void pickUpGoodieIfAppropriate(Goodie* g);
+    virtual void dieByFallOrBurnIfAppropriate(){}
     
     // Does this object block agent movement?
-    virtual bool blocksMovement() const;
+    virtual bool blocksAgent() const
+    { return false; }
     
     virtual bool canKillByFlame() const
     { return true; }
@@ -52,30 +47,24 @@ public:
     virtual bool canInfectByVomit() const
      { return false; }
     
-    virtual void setInfectionStatus();
+    virtual void setInfectionStatus(){}
     
     // Does this object block flames?
     virtual bool blocksFlame() const
     { return false; }
     
-    virtual bool blocksAgent() const
-    { return false; }
+    
     
     // Can this object cause a zombie to vomit?
-    virtual bool triggersZombieVomit() const;
+    // virtual bool triggersZombieVomit() const
+
     
     // Does this object trigger landmines only when they're active?
-    virtual bool triggersOnlyActiveLandmines() const;
+    // virtual bool triggersOnlyActiveLandmines() const;
     
     virtual bool isZombie()
     { return true; }
-    
-    
-    void moveUp();
-    void moveDown();
-    void moveLeft();
-    void moveRight();
-    
+   
 private:
     
     StudentWorld* m_world;
@@ -124,7 +113,6 @@ public:
     void doSomething();
     bool blocksFlame(Actor* flame) const
     { return true; }
-    virtual void activateIfAppropriate(Actor* a);
     
     virtual bool canKillByFlame() const
     { return false; }
@@ -213,7 +201,7 @@ public:
     
     virtual void doSomething();
     virtual void activateIfAppropriate(Actor* a);
-    virtual void dieByFallOrBurnIfAppropriate();
+    // virtual void dieByFallOrBurnIfAppropriate();
     virtual void pickUp(Penelope* p);
     
     virtual bool canKillByLandmine() const
@@ -259,17 +247,12 @@ class Agent: public Actor
 {
 public:
     Agent(StudentWorld* gw, int imageID, double startX, double startY);
-    virtual void dieByFallOrBurn()=0;
-    virtual bool blocksMovement() const;
-    virtual bool triggersOnlyActiveLandmines() const;
     
     virtual bool canKillByPit() const
     { return true; }
     
     virtual bool blocksAgent() const
     { return true; }
-    
-    virtual bool
     
     
 };
@@ -296,9 +279,6 @@ public:
     }
     
     virtual void useExitIfAppropriate(Exit* exit);
-    
-    virtual void beVomitedOnIfAppropriate();
-    
     virtual bool canInfectByVomit() const
     { return true; }
     
@@ -317,14 +297,11 @@ public:
     
     virtual void doSomething();
     void fire(Direction dir); //Fire flame
+    void moveToPosition(double x, double y, Direction dir);
     
-    virtual void dieByFallOrBurnIfAppropriate()
-    {
-        setDead();
-        getWorld()->playSound(SOUND_PLAYER_DIE);
-    }
+    virtual void dieByFallOrBurnIfAppropriate();
     
-    virtual void pickUpGoodieIfAppropriate(Goodie* g);
+    // virtual void pickUpGoodieIfAppropriate(Goodie* g);
     
     // Increase the number of vaccines the object has.
     void increaseVaccines()
@@ -342,15 +319,15 @@ public:
     int getNumVaccines() const
     { return vaccine_count; }
     
-    // How many flame charges does the object have?
-    int getNumFlameCharges() const
-    { return flame_count; }
+//    // How many flame charges does the object have?
+//    int getNumFlameCharges() const
+//    { return flame_count; }
     
     // How many landmines does the object have?
     int getNumLandmines() const
     { return mine_count; }
     
-    //
+    
     void fireGasCan();
     
     void useLandmine();
@@ -404,15 +381,8 @@ public:
     virtual void computeVomitPosition(double& x,double& y);
     virtual bool vomitIfAppropriate(const double& x, const double& y);
     virtual void doSomething();
-    virtual void isZombie()
+    virtual bool isZombie()
     { return true; }
-    
-    virtual void dieByFallOrBurnIfAppropriate()
-    {
-        setDead();
-        getWorld()->playSound(SOUND_ZOMBIE_DIE);
-    }
-    
     
     virtual void moveToNewPosition();
     
@@ -426,7 +396,7 @@ public:
     { moves--; }
     
     virtual void setNewMoves()
-    { int moves=randInt(3,10); }
+    { moves=randInt(3,10); }
     
     virtual void setNewDirection();
     
@@ -439,13 +409,7 @@ class DumbZombie: public Zombie
 public:
     DumbZombie(StudentWorld* gw, double startX, double startY);
     //void doSomething();
-    virtual void dieByFallOrBurnIfAppropriate()
-    {
-        Zombie::dieByFallOrBurnIfAppropriate();
-        dropVaccineByChance(getX(), getY());
-        getWorld()->increaseScore(1000);
-        
-    }
+    virtual void dieByFallOrBurnIfAppropriate();
     void dropVaccineByChance(const double x, const double y);
     
 };
@@ -456,11 +420,8 @@ public:
     SmartZombie(StudentWorld* gw, double startX, double startY);
     //void doSomething();
     
-    virtual void dieByFallOrBurnIfAppropriate()
-    {
-        Zombie::dieByFallOrBurnIfAppropriate();
-        getWorld()->increaseScore(2000);
-    }
+    virtual void dieByFallOrBurnIfAppropriate();
+    
     virtual void setNewDirection();
     
     Direction pickDirection(double x, double y, double target_x, double target_y);

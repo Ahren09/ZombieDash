@@ -65,3 +65,6 @@ void killByPitIfAppropriate(Pit* pit);
 
 Since they all operate on StudentWorld class,
 void activateOnAppropriateActors(Actor* a);
+
+
+I place all playSound() inside respective Actor class
