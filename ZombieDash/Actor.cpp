@@ -14,6 +14,27 @@ Actor::Actor(StudentWorld* gw, int imageID, double startX, double startY,
 m_world(gw),aliveStatus(true)
 {};
 
+Direction Actor::getDirectionByNum(int n)
+{
+    switch (n) {
+        case 1:
+            return right;
+            break;
+        case 2:
+            return up;
+            break;
+        case 3:
+            return left;
+            break;
+        case 4:
+            return down;
+            break;
+        default:
+            return -1;
+        
+    }
+    
+}
 
 //Mark: Wall
 
@@ -449,14 +470,16 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
 {
     bool successfulMove=false;
     
-    std::vector<Direction> direction_pool;
+    std::vector<int> direction_pool;
     double new_x, new_y;
     bool oneMove=pickDirection(getX(), getY(), p_x, p_y, direction_pool);
-        
+    Direction d;
+    
     //Penelop is on the same row/col, ONE direction available
     if(oneMove)
     {
-        getWorld()->determineNewPosition(direction_pool[0], new_x, new_y, 2);
+        d=getDirectionByNum(direction_pool[0]);
+        getWorld()->determineNewPosition(d, new_x, new_y, 2);
         //Not blocked
         successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
         if(successfulMove)
@@ -470,7 +493,8 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
         //Penelop is NOT on the same row/col, TWO directions available
         else if(!oneMove)
         {
-            getWorld()->determineNewPosition(direction_pool[1], new_x, new_y, 2);
+            d=getDirectionByNum(direction_pool[1]);
+            getWorld()->determineNewPosition(d, new_x, new_y, 2);
             //Not blocked
             successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
             if(successfulMove)
@@ -487,7 +511,7 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
 bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
 {
     
-    std::vector<Direction> direction_pool;
+    std::vector<int> direction_pool;
     bool successfulMove=false;
     bool oneMove=pickReverseDirection(getX(), getY(), zombie_x, zombie_y, direction_pool);
     double new_x, new_y;
@@ -496,19 +520,21 @@ bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
     //Zombie is on the same row/col, ONE direction available
     if(oneMove)
     {
-        getWorld()->determineNewPosition(direction_pool[0], new_x, new_y, 2);
+        Direction d1=getDirectionByNum(direction_pool[0]);
+        getWorld()->determineNewPosition(d1, new_x, new_y, 2);
         //Not blocked
         successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
         if(successfulMove)
         {
-            setDirection(direction_pool[0]);
+            setDirection(d1);
             moveTo(new_x,new_y);
         }
         //Citizen is blocked. First Direction fails
         //Zombie is NOT on the same row/col, TWO directions available
         else if(!oneMove)
         {
-            getWorld()->determineNewPosition(direction_pool[1], new_x, new_y, 2);
+            Direction d2=getDirectionByNum(direction_pool[1]);
+            getWorld()->determineNewPosition(d2, new_x, new_y, 2);
             //Not blocked
             successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
             if(successfulMove)
@@ -523,43 +549,43 @@ bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
     
 }
 
-bool Citizen::pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<Direction> direction_pool)
+bool Citizen::pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<int> direction_pool)
 {
-    std::vector<Direction> temp;
+    std::vector<int> temp;
     pickDirection(x, y, OtherX, OtherY,temp);
-    if(std::find(temp.begin(),temp.end(),GraphObject::left)!= temp.end())
-        direction_pool.push_back(GraphObject::right);
-    if(std::find(temp.begin(),temp.end(),GraphObject::right)== temp.end())
-        direction_pool.push_back(GraphObject::left);
-    if(std::find(temp.begin(),temp.end(),GraphObject::up)== temp.end())
-        direction_pool.push_back(GraphObject::down);
-    if(std::find(temp.begin(),temp.end(),GraphObject::down)== temp.end())
-        direction_pool.push_back(GraphObject::up);
+    if(std::find(temp.begin(),temp.end(),3)!= temp.end())
+        direction_pool.push_back(1);
+    if(std::find(temp.begin(),temp.end(),1)== temp.end())
+        direction_pool.push_back(3);
+    if(std::find(temp.begin(),temp.end(),2)== temp.end())
+        direction_pool.push_back(4);
+    if(std::find(temp.begin(),temp.end(),4)== temp.end())
+        direction_pool.push_back(2);
     return direction_pool.size()==1;
 }
 
-bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std::vector<Direction> direction_pool)
+bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std::vector<int> direction_pool)
 {
     double d_x=OtherX-x;
     double d_y=OtherY-y;
     
     if(d_x>0)
     {
-        direction_pool.push_back(right);
+        direction_pool.push_back(1);
     }
     
     else if(d_x<0)
     {
-        direction_pool.push_back(left);
+        direction_pool.push_back(3);
     }
     
     if(d_y>0)
     {
-        direction_pool.push_back(up);
+        direction_pool.push_back(2);
     }
     else if(d_y<0)
     {
-        direction_pool.push_back(down);
+        direction_pool.push_back(4);
     }
     
     return direction_pool.size()==1;
@@ -641,19 +667,19 @@ void Zombie::moveToNewPosition()
 
 void Zombie::setNewDirection()
 {
-    int dir=randInt(0,3);
+    int dir=randInt(1,4);
     switch(dir)
     {
-        case 0:
+        case 1:
             setDirection(right);
             break;
-        case 1:
+        case 2:
             setDirection(up);
             break;
-        case 2:
+        case 3:
             setDirection(left);
             break;
-        case 3:
+        case 4:
             setDirection(down);
             break;
     }
@@ -729,25 +755,25 @@ Direction SmartZombie::pickDirection(double x, double y, double target_x, double
     double d_x=target_x-x;
     double d_y=target_y-y;
     
-    std::vector<Direction> direction_pool;
+    std::vector<int> direction_pool;
     
     if(d_x>0)
     {
-        direction_pool.push_back(GraphObject::right);
+        direction_pool.push_back(1);
     }
     
     else if(d_x<0)
     {
-        direction_pool.push_back(GraphObject::left);
+        direction_pool.push_back(3);
     }
     
     if(d_y>0)
     {
-        direction_pool.push_back(GraphObject::up);
+        direction_pool.push_back(2);
     }
     else if(d_y<0)
     {
-        direction_pool.push_back(GraphObject::down);
+        direction_pool.push_back(4);
     }
     
     if(direction_pool.size()==1)
