@@ -215,6 +215,19 @@ void StudentWorld::introduceFlameIfAppropriate(double x, double y)
     }
 }
 
+void StudentWorld::triggerLandmineIfAppropriate(Landmine* landmine)
+{
+    landmine->activateIfAppropriate(pene);
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        if(landmine->isAlive())
+        {
+            landmine->activateIfAppropriate(*it);
+        }
+        else break;
+    }
+    
+}
 void StudentWorld::useExit(Exit* exit)
 {
     pene->useExitIfAppropriate(exit);

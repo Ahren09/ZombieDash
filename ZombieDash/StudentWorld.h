@@ -111,6 +111,8 @@ public:
         return dist_p<=6400;
     }
     
+    void triggerLandmineIfAppropriate(Landmine* landmine);
+    
     void writeStatus();
     
     

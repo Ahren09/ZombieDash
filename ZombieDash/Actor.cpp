@@ -184,9 +184,7 @@ void Landmine::doSomething()
     //IF Landmine is activated
     if(activationCountDown())
     {
-        Penelope* p;
-        activateIfAppropriate(getWorld()->getPenelope());
-        getWorld()->activateOnAppropriateActors(this);
+        getWorld()->triggerLandmineIfAppropriate(this);
         
     }
 }
