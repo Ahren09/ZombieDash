@@ -30,7 +30,7 @@ public:
     int getZombieCount() const
     { return zombie_count; }
     
-    void recordCitizenGone()
+    void decreaseCitizenCount()
     { citizen_count--; }
     
     Penelope* getPenelope() const
@@ -48,8 +48,6 @@ public:
     void decreaseZombieCount()
     { zombie_count--; }
     
-    void decreaseCitizenCount()
-    { citizen_count--; }
     
     //Try to introduce a Flame object at specified xy location
     void introduceFlameIfAppropriate(double x, double y);
@@ -105,7 +103,7 @@ public:
     
     //Get Citizen's distance to Penelope, set p_x and p_y to Penelope's position
     //return true if distance less than 80px
-    bool getPenelopeDist(double x, double y, double& p_x, double& p_y, double dist_p)
+    bool getPenelopeDist(double x, double y, double& p_x, double& p_y, double& dist_p)
     {
         p_x=pene->getX();
         p_y=pene->getY();

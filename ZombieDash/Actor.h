@@ -38,11 +38,9 @@ public:
     virtual bool blocksAgent() const
     { return false; }
     
-    virtual bool canKillByFlame() const
+    virtual bool canKillByFlameAndPit() const
     { return true; }
     
-    virtual bool canKillByPit() const
-    { return false; }
     
     virtual bool canInfectByVomit() const
      { return false; }
@@ -63,7 +61,7 @@ public:
     // virtual bool triggersOnlyActiveLandmines() const;
     
     virtual bool isZombie()
-    { return true; }
+    { return false; }
     
     bool determineNewPosition(Direction dir, double& x, double& y, double distance);
     
@@ -95,8 +93,6 @@ public:
     bool blocksFlame(Actor* flame) const
     { return true; }
     
-    virtual bool canKillByFlame() const
-    { return false; }
     
     virtual bool blocksAgent() const
     { return true; }
@@ -124,7 +120,7 @@ public:
     bool blocksFlame(Actor* flame) const
     { return true; }
     
-    virtual bool canKillByFlame() const
+    virtual bool canKillByFlameAndPit() const
     { return false; }
     
     
@@ -136,7 +132,7 @@ public:
     Pit(StudentWorld* gw, double startX, double startY);
     void doSomething();
     void activateIfAppropriate(Actor* a);
-    virtual bool canKillByFlame() const
+    virtual bool canKillByFlameAndPit() const
     { return false; }
     
 };
@@ -151,7 +147,7 @@ public:
     { return active_count; }
     void decCount()
     { active_count--; }
-    virtual bool canKillByFlame() const
+    virtual bool canKillByFlameAndPit() const
     { return false; }
     
     void killByFlameIfAppropriate(Actor* a);
@@ -214,7 +210,7 @@ public:
     // virtual void dieByFallOrBurnIfAppropriate();
     virtual void pickUp(Penelope* p);
     
-    virtual bool canKillByLandmine() const
+    virtual bool canKillByFlameAndPit() const
     { return true; }
     
 };
@@ -255,7 +251,7 @@ class Agent: public Actor
 public:
     Agent(StudentWorld* gw, int imageID, double startX, double startY);
     
-    virtual bool canKillByPit() const
+    virtual bool canKillByFlameAndPit() const
     { return true; }
     
     virtual bool blocksAgent() const
@@ -366,12 +362,12 @@ public:
     
     virtual bool moveToPenelope(double p_x, double p_y);
     
-    bool moveAwayFromZombie(double zombie_x, double zombie_y);
+    bool moveAwayFromZombie(double zombie_x, double zombie_y, double dist_z);
     
     //Returns true if Citizen is on the same row/col as Penelope
     bool pickDirection(double x, double y, double target_x, double target_y,std::vector<int>& direction_pool);
     
-    bool pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool);
+    bool pickEscapeDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool, std::vector<double>& dist_pool, double current_dist_z);
     
     
     
@@ -408,6 +404,9 @@ public:
     { moves=randInt(3,10); }
     
     virtual void setNewDirection();
+    
+    virtual void dieByFallOrBurnIfAppropriate();
+    
     
 private:
     int moves;

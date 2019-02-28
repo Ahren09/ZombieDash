@@ -102,7 +102,6 @@ Exit::Exit(StudentWorld* gw, double startX, double startY)
 void Exit::doSomething()
 {
     getWorld()->useExit(this);
-    getWorld()->getPenelope()->useExitIfAppropriate(this);
 }
 
 
@@ -117,7 +116,7 @@ void Pit::doSomething()
 
 void Pit::activateIfAppropriate(Actor* a)
 {
-    if(a->canKillByPit() && getWorld()->checkOverlapByTwoObjects(this, a) )
+    if(a->canKillByFlameAndPit() && getWorld()->checkOverlapByTwoObjects(this, a) )
     {
         a->setDead();
     }
@@ -143,7 +142,7 @@ void Flame::doSomething()
 //Set Agents that overlap with Flame to dead
 void Flame::activateIfAppropriate(Actor* a)
 {
-    if(a->canKillByFlame() && getWorld()-> checkOverlapByTwoObjects(this, a))
+    if(a->canKillByFlameAndPit() && getWorld()-> checkOverlapByTwoObjects(this, a))
     {
         a->dieByFallOrBurnIfAppropriate();
     }
@@ -161,7 +160,6 @@ void Vomit::doSomething()
     {
         decCount();
         getWorld()->activateOnAppropriateActors(this);
-        activateIfAppropriate(getWorld()->getPenelope());
     }
     else setDead();
 }
@@ -186,6 +184,8 @@ void Landmine::doSomething()
     //IF Landmine is activated
     if(activationCountDown())
     {
+        Penelope* p;
+        activateIfAppropriate(getWorld()->getPenelope());
         getWorld()->activateOnAppropriateActors(this);
         
     }
@@ -193,12 +193,11 @@ void Landmine::doSomething()
 
 void Landmine::activateIfAppropriate(Actor* a)
 {
-    
     if(getWorld()->checkOverlapByTwoObjects(this, a))
     {
         dieByFallOrBurnIfAppropriate();
+        return;
     }
-    
 }
 
 
@@ -431,6 +430,7 @@ void Penelope::useExitIfAppropriate(Exit* exit)
 {
     if(getWorld()->checkOverlapByTwoObjects(this, exit))
     {
+        
         if(getWorld()->getCitizenCount() == 0)
         {
             getWorld()->recordLevelFinishedIfAllCitizensGone();
@@ -441,7 +441,6 @@ void Penelope::useExitIfAppropriate(Exit* exit)
 void Penelope::dieByFallOrBurnIfAppropriate()
 {
     setDead();
-    getWorld()->playSound(SOUND_PLAYER_DIE);
 }
 
 Citizen::Citizen(StudentWorld* gw, double startX, double startY)
@@ -453,10 +452,10 @@ void Citizen::useExitIfAppropriate(Exit* exit)
     if(getWorld()->checkOverlapByTwoObjects(this, exit))
     {
         setDead();
+        getWorld()->decreaseCitizenCount();
         getWorld()->increaseScore(500);
         getWorld()->playSound(SOUND_CITIZEN_SAVED);
     }
-    getWorld()->recordCitizenGone();
 }
 
 void Citizen::dieByFallOrBurnIfAppropriate()
@@ -475,6 +474,11 @@ void Citizen::doSomething()
     if(!isAlive())
     { return; }
     
+    if(getInfectionCount()>=500)
+    {
+        turnIntoZombie();
+    }
+    
     double zombie_x, zombie_y, dist_z, dist_p;
     double p_x, p_y;
     
@@ -486,13 +490,14 @@ void Citizen::doSomething()
     //IF Penelope is within 80px, AND Penelope is closer to the nearest zombie OR there's no Zombie
     if((getWorld()->getZombieCount()==0 || dist_p<=dist_z) && dist_p<=6400 )
     {
+        //IF Citizen is on the same row or col as Penelope
         if(moveToPenelope(p_x,p_y)) return;
     }
     
     //ELSE try to escape nearest Zombie
     else if(dist_z<=6400)
     {
-        moveAwayFromZombie(zombie_x, zombie_y);
+        moveAwayFromZombie(zombie_x, zombie_y, dist_z);
     }
     
 }
@@ -502,7 +507,7 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
     bool successfulMove=false;
     
     std::vector<int> direction_pool;
-    double new_x, new_y;
+    double new_x=getX(), new_y=getY();
     pickDirection(getX(), getY(), p_x, p_y, direction_pool);
     Direction d;
     
@@ -513,11 +518,11 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
     {
         d=getDirectionByNum(direction_pool[i]);
         determineNewPosition(d, new_x, new_y, 2);
-        //Not blocked
+        //No blocking agent
         successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
         if(successfulMove)
         {
-            setDirection(direction_pool[i]);
+            setDirection(d);
             moveTo(new_x,new_y);
             break;
         }
@@ -526,60 +531,111 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
     return successfulMove;
 }
 
-bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
+bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y, double dist_z)
 {
-    
-    std::vector<int> direction_pool;
     bool successfulMove=false;
-    bool oneMove=pickReverseDirection(getX(), getY(), zombie_x, zombie_y, direction_pool);
-    double new_x, new_y;
+    std::vector<int> direction_pool;
+    std::vector<double> dist_pool;
     
+    //If All directions are either blocked or closer to the nearest zombie, return false
+    if(!pickEscapeDirection(getX(), getY(), zombie_x, zombie_y, direction_pool, dist_pool, dist_z))
+        return false;
     
-    //Zombie is on the same row/col, ONE direction available
-    if(oneMove)
+    //Represents Direction and X,Y Coordinates of the new move
+    Direction new_dir;
+    double new_x,new_y;
+    double new_dist_z=dist_z;
+    
+    //dist_z: distance to nearest Zombie before move
+    //new_dist_z: distance to nearest Zombie after move
+    //new_temp_dist_z: distance to nearest Zombie after move IN EACH ITERATION
+    
+    //Attempt each unblocked escape direction given by pickEscapeDirection()
+    for(int i=0;i<direction_pool.size();i++)
     {
-        Direction d1=getDirectionByNum(direction_pool[0]);
-        determineNewPosition(d1, new_x, new_y, 2);
-        //Not blocked
-        successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
-        if(successfulMove)
+        double temp_new_x=getX(), temp_new_y=getY();
+        double new_zombie_x=zombie_x, new_zombie_y=zombie_y, new_temp_dist_z=dist_z;
+        Direction d=getDirectionByNum(direction_pool[i]);
+        
+        //Determine new position of Citizen
+        determineNewPosition(d, temp_new_x, temp_new_y, 2);
+        
+        //Determine position of new nearest zombie and new distance to nearest Zombie
+        getWorld()->locateNearestCitizenThreat(temp_new_x, temp_new_y, new_zombie_x, new_zombie_y, new_temp_dist_z);
+        
+        //If there's no zombie nearer than dist_z after the move
+        if(new_temp_dist_z>dist_z)
         {
-            setDirection(d1);
-            moveTo(new_x,new_y);
-        }
-        //Citizen is blocked. First Direction fails
-        //Zombie is NOT on the same row/col, TWO directions available
-        else if(!oneMove)
-        {
-            Direction d2=getDirectionByNum(direction_pool[1]);
-            determineNewPosition(d2, new_x, new_y, 2);
-            //Not blocked
-            successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
-            if(successfulMove)
+            successfulMove=true;
+            if(new_temp_dist_z>new_dist_z)
             {
-                setDirection(direction_pool[1]);
-                moveTo(new_x,new_y);
+                new_dist_z=new_temp_dist_z;
+                new_dir=direction_pool[i];
+                new_x=temp_new_x;
+                new_y=temp_new_y;
             }
         }
+    }
+    
+    if(successfulMove)
+    {
+        setDirection(new_dir);
+        moveTo(new_x,new_y);
+        
     }
     
     return successfulMove;
     
 }
 
-bool Citizen::pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool)
+bool Citizen::pickEscapeDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool, std::vector<double>& dist_pool, double current_dist_z)
 {
-    std::vector<int> temp;
-    pickDirection(x, y, OtherX, OtherY,temp);
-    if(std::find(temp.begin(),temp.end(),3)!= temp.end())
-        direction_pool.push_back(1);
-    if(std::find(temp.begin(),temp.end(),1)== temp.end())
-        direction_pool.push_back(3);
-    if(std::find(temp.begin(),temp.end(),2)== temp.end())
-        direction_pool.push_back(4);
-    if(std::find(temp.begin(),temp.end(),4)== temp.end())
-        direction_pool.push_back(2);
-    return direction_pool.size()==1;
+    bool hasFurther=false;
+    double dist;
+    if(!getWorld()->isAgentMovementBlockedAt(this, x+2, y))
+    {
+        dist=(x+2-OtherX)*(x+2-OtherX)+(y-OtherY)*(y-OtherY);
+        if(dist>current_dist_z)
+        {
+            hasFurther=true;
+            direction_pool.push_back(1);
+            dist_pool.push_back(dist);
+        }
+        
+    }
+    else if(!getWorld()->isAgentMovementBlockedAt(this, x, y+2))
+    {
+        
+        dist=(x-OtherX)*(x-OtherX)+(y+2-OtherY)*(y+2-OtherY);
+        if(dist>current_dist_z)
+        {
+            hasFurther=true;
+            direction_pool.push_back(2);
+            dist_pool.push_back(dist);
+        }
+    }
+    else if(!getWorld()->isAgentMovementBlockedAt(this, x-2, y))
+    {
+        dist=(x-2-OtherX)*(x-2-OtherX)+(y-OtherY)*(y-OtherY);
+        if(dist>current_dist_z)
+        {
+            hasFurther=true;
+            direction_pool.push_back(3);
+            dist_pool.push_back(dist);
+        }
+    }
+    else if(!getWorld()->isAgentMovementBlockedAt(this, x, y-2))
+    {
+        dist=(x-OtherX)*(x-OtherX)+(y-2-OtherY)*(y-2-OtherY);
+        if(dist>current_dist_z)
+        {
+            hasFurther=true;
+            direction_pool.push_back(4);
+            dist_pool.push_back(dist);
+        }
+    }
+    
+    return hasFurther;
 }
 
 bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool)
@@ -681,6 +737,13 @@ void Zombie::moveToNewPosition()
         }
         else setMoves(0);
     }
+}
+
+void Zombie::dieByFallOrBurnIfAppropriate()
+{
+    setDead();
+    getWorld()->playSound(SOUND_ZOMBIE_DIE);
+    
 }
 
 void Zombie::setNewDirection()

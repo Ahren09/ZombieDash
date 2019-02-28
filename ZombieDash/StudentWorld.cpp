@@ -35,6 +35,11 @@ StudentWorld::~StudentWorld()
 
 int StudentWorld::init()
 {
+    
+    citizen_count=0;
+    zombie_count=0;
+    gameFinished=false;
+    
     Level lev(assetPath());
     //Create string containing name of file
     ostringstream oss;
@@ -72,7 +77,7 @@ int StudentWorld::init()
                     case Level::citizen:{
                         Actor* actor = new Citizen(this,x*SPRITE_WIDTH,y*SPRITE_HEIGHT);
                         m_actors.push_back(actor);
-                        
+                        citizen_count++;
                     }break;
                     
                     case Level::pit:{
@@ -126,8 +131,6 @@ int StudentWorld::init()
             }
             
         }
-        
-        
         
         
     }
@@ -197,6 +200,7 @@ bool StudentWorld::isFlameBlockedAt(double x, double y) const
 //
 void StudentWorld::activateOnAppropriateActors(Actor* a)
 {
+    a->activateIfAppropriate(pene);
     for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
         a->activateIfAppropriate(*it);
@@ -272,10 +276,11 @@ bool StudentWorld::locateNearestCitizenTrigger(double zombie_x, double zombie_y,
 
 //Locate nearest Zombie to the Citizen
 //Called by Citizen
-//Returns true if there is zombie closer than 80 pixels
+//Returns true if there is zombie closer than 80px
+
 bool StudentWorld::locateNearestCitizenThreat(double citizen_x, double citizen_y, double& otherX, double& otherY, double& dist_z)
 {
-    double dist;
+    
     dist_z=INT_MAX;
     double x=INT_MAX, y=INT_MAX;
     for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
@@ -287,7 +292,7 @@ bool StudentWorld::locateNearestCitizenThreat(double citizen_x, double citizen_y
             y=(*it)->getY();
             
             double distance=(citizen_x-x)*(citizen_x-x)+(citizen_y-y)*(citizen_y-y);
-            if(distance<dist)
+            if(distance<dist_z)
             {
                 dist_z=distance;
                 otherX=x;
@@ -310,9 +315,14 @@ bool StudentWorld::isBlocked(double a_x, double a_y, double c_x, double c_y) con
 
 bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
 {
+    //ag is the pointer to identify the object that calls this function
+    if(ag!=pene && isBlocked(pene->getX(), pene->getY(), x, y))
+        return true;
+        
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        //TODO:
+        if((*it)==ag) continue;
+        
         if((*it)->blocksAgent() && isBlocked(x,y,(*it)->getX(), (*it)->getY()) && (*it)!=ag)
         {
             return true;
