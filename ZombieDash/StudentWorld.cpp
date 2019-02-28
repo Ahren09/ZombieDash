@@ -29,10 +29,6 @@ StudentWorld::~StudentWorld()
     cleanUp();
 }
 
-
-
-
-
 int StudentWorld::init()
 {
     
