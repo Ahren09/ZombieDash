@@ -369,9 +369,9 @@ public:
     bool moveAwayFromZombie(double zombie_x, double zombie_y);
     
     //Returns true if Citizen is on the same row/col as Penelope
-    bool pickDirection(double x, double y, double target_x, double target_y,std::vector<int> direction_pool);
+    bool pickDirection(double x, double y, double target_x, double target_y,std::vector<int>& direction_pool);
     
-    bool pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<int> direction_pool);
+    bool pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool);
     
     
     

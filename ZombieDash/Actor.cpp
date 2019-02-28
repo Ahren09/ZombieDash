@@ -478,9 +478,7 @@ void Citizen::doSomething()
     
     Human::doSomething();
     if(!isAlive())
-    {
-        return;
-    }
+    { return; }
     
     double zombie_x, zombie_y, dist_z, dist_p;
     double p_x, p_y;
@@ -510,36 +508,23 @@ bool Citizen::moveToPenelope(double p_x, double p_y)
     
     std::vector<int> direction_pool;
     double new_x, new_y;
-    bool oneMove=pickDirection(getX(), getY(), p_x, p_y, direction_pool);
+    pickDirection(getX(), getY(), p_x, p_y, direction_pool);
     Direction d;
     
     //Penelop is on the same row/col, ONE direction available
-    if(oneMove)
+    //Otherwise, Citizen is blocked. First Direction fails
+    //Penelop is NOT on the same row/col, TWO directions available
+    for(int i=0;i<direction_pool.size();i++)
     {
-        d=getDirectionByNum(direction_pool[0]);
+        d=getDirectionByNum(direction_pool[i]);
         determineNewPosition(d, new_x, new_y, 2);
         //Not blocked
         successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
         if(successfulMove)
         {
-            setDirection(direction_pool[0]);
+            setDirection(direction_pool[i]);
             moveTo(new_x,new_y);
-        }
-        
-        
-        //Citizen is blocked. First Direction fails
-        //Penelop is NOT on the same row/col, TWO directions available
-        else if(!oneMove)
-        {
-            d=getDirectionByNum(direction_pool[1]);
-            determineNewPosition(d, new_x, new_y, 2);
-            //Not blocked
-            successfulMove=!getWorld()->isAgentMovementBlockedAt(this, new_x, new_y);
-            if(successfulMove)
-            {
-                setDirection(direction_pool[1]);
-                moveTo(new_x,new_y);
-            }
+            break;
         }
     }
     
@@ -587,7 +572,7 @@ bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y)
     
 }
 
-bool Citizen::pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<int> direction_pool)
+bool Citizen::pickReverseDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool)
 {
     std::vector<int> temp;
     pickDirection(x, y, OtherX, OtherY,temp);
@@ -602,7 +587,7 @@ bool Citizen::pickReverseDirection(double x, double y, double OtherX, double Oth
     return direction_pool.size()==1;
 }
 
-bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std::vector<int> direction_pool)
+bool Citizen::pickDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool)
 {
     double d_x=OtherX-x;
     double d_y=OtherY-y;
@@ -792,7 +777,6 @@ Direction SmartZombie::pickDirection(double x, double y, double target_x, double
 {
     double d_x=target_x-x;
     double d_y=target_y-y;
-    
     std::vector<int> direction_pool;
     
     if(d_x>0)

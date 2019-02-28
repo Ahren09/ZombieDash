@@ -106,7 +106,8 @@ public:
     
     void useExit(Exit* exit);
     
-    //Get Citizen's distance to Penelope, returns true if less than 80
+    //Get Citizen's distance to Penelope, set p_x and p_y to Penelope's position
+    //return true if distance less than 80px
     bool getPenelopeDist(double x, double y, double& p_x, double& p_y, double dist_p)
     {
         p_x=pene->getX();

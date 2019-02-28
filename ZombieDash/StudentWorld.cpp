@@ -156,7 +156,6 @@ int StudentWorld::move()
         {
             return GWSTATUS_PLAYER_DIED;
         }
-        
     }
     
     //if citizen Penelope has escaped
@@ -176,10 +175,6 @@ int StudentWorld::move()
             m_actors.erase(it);
         }
     }
-    
-    
-    
-   
     
     return GWSTATUS_CONTINUE_GAME;
     
