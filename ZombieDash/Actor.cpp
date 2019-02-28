@@ -116,7 +116,7 @@ void Pit::doSomething()
 
 void Pit::activateIfAppropriate(Actor* a)
 {
-    if(a->canKillByFlameAndPit() && getWorld()->checkOverlapByTwoObjects(this, a) )
+    if(a->canKillByFlameAndPit() && getWorld()->checkOverlapByTwoObjects(this, a) && isAlive())
     {
         a->dieByFallOrBurnIfAppropriate();
     }
@@ -182,7 +182,7 @@ activation_count(30),activation_status(false)
 void Landmine::doSomething()
 {
     //IF Landmine is activated
-    if(activationCountDown())
+    if(isAlive() && activationCountDown())
     {
         getWorld()->triggerLandmineIfAppropriate(this);
         
@@ -587,7 +587,6 @@ bool Citizen::moveAwayFromZombie(double zombie_x, double zombie_y, double dist_z
     {
         setDirection(new_dir);
         moveTo(new_x,new_y);
-        
     }
     
     return successfulMove;
@@ -681,7 +680,7 @@ void Citizen::turnIntoZombie()
     gw->increaseScore(-1000);
     gw->playSound(SOUND_ZOMBIE_BORN);
     int randnum=randInt(1, 10);
-    if(randnum>0 && randnum<=3)
+    if(randnum>0 && randnum<=10)
         gw->addActor(new SmartZombie(gw, getX(),getY()));
     else getWorld()->addActor(new DumbZombie(gw, getX(),getY()));
 }

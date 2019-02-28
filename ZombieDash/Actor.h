@@ -93,6 +93,8 @@ public:
     bool blocksFlame(Actor* flame) const
     { return true; }
     
+    virtual bool canKillByFlameAndPit() const
+    { return false; }
     
     virtual bool blocksAgent() const
     { return true; }

@@ -222,7 +222,8 @@ void StudentWorld::triggerLandmineIfAppropriate(Landmine* landmine)
     {
         if(landmine->isAlive())
         {
-            landmine->activateIfAppropriate(*it);
+            if((*it)!=landmine)
+                landmine->activateIfAppropriate(*it);
         }
         else break;
     }
@@ -274,7 +275,7 @@ bool StudentWorld::locateNearestCitizenTrigger(double zombie_x, double zombie_y,
     distance=(zombie_x-target_x)*(zombie_x-target_x)+(zombie_y-target_y)*(zombie_y-target_y);
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if((*it)->canInfectByVomit())
+        if((*it)->canInfectByVomit() && (*it)-> isAlive() )
         {
             double x=(*it)->getX();
             double y=(*it)->getY();
