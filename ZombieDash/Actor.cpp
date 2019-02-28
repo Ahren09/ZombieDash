@@ -118,7 +118,7 @@ void Pit::activateIfAppropriate(Actor* a)
 {
     if(a->canKillByFlameAndPit() && getWorld()->checkOverlapByTwoObjects(this, a) )
     {
-        a->setDead();
+        a->dieByFallOrBurnIfAppropriate();
     }
 }
 
@@ -176,7 +176,7 @@ void Vomit::activateIfAppropriate(Actor *a)
 
 Landmine::Landmine(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_LANDMINE, startX, startY, right, 1),
-activation_count(90),activation_status(false)
+activation_count(30),activation_status(false)
 {}
 
 void Landmine::doSomething()
@@ -256,6 +256,11 @@ void Goodie::doSomething()
     {
         pickUp(p);
     }
+}
+
+void Goodie::dieByFallOrBurnIfAppropriate()
+{
+    setDead();
 }
 
 VaccineGoodie::VaccineGoodie(StudentWorld* gw, double startX, double startY)
@@ -462,6 +467,7 @@ void Citizen::dieByFallOrBurnIfAppropriate()
     setDead();
     getWorld()->playSound(SOUND_CITIZEN_DIE);
     getWorld()->increaseScore(-1000);
+    getWorld()->decreaseCitizenCount();
 }
 
 void Citizen::doSomething()
@@ -476,6 +482,7 @@ void Citizen::doSomething()
     if(getInfectionCount()>=500)
     {
         turnIntoZombie();
+        return;
     }
     
     double zombie_x, zombie_y, dist_z, dist_p;

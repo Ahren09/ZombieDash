@@ -150,8 +150,6 @@ public:
     virtual bool canKillByFlameAndPit() const
     { return false; }
     
-    void killByFlameIfAppropriate(Actor* a);
-    
 private:
     int active_count;
 };
@@ -209,9 +207,7 @@ public:
     virtual void activateIfAppropriate(Actor* a);
     // virtual void dieByFallOrBurnIfAppropriate();
     virtual void pickUp(Penelope* p);
-    
-    virtual bool canKillByFlameAndPit() const
-    { return true; }
+    void dieByFallOrBurnIfAppropriate();
     
 };
 
@@ -251,8 +247,6 @@ class Agent: public Actor
 public:
     Agent(StudentWorld* gw, int imageID, double startX, double startY);
     
-    virtual bool canKillByFlameAndPit() const
-    { return true; }
     
     virtual bool blocksAgent() const
     { return true; }
