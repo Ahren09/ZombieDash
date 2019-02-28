@@ -105,13 +105,6 @@ void Exit::doSomething()
     getWorld()->getPenelope()->useExitIfAppropriate(this);
 }
 
-//void Exit::activateIfAppropriate(Actor* a)
-//{
-//    if(getWorld()->checkOverlapByTwoObjects(this, a) )
-//    {
-//        a->setDead();
-//    }
-//}
 
 Pit::Pit(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_PIT, startX, startY, right, 0)
@@ -366,11 +359,7 @@ void Penelope::doSomething()
                 break;
                 
             case KEY_PRESS_SPACE:
-                if(flame_count>0)
-                {
-                    fireGasCan();
-                    flame_count--;
-                }
+                fireGasCan();
                 break;
                 
             case KEY_PRESS_ENTER:
@@ -404,32 +393,39 @@ void Penelope::useVaccine()
 
 void Penelope::fireGasCan()
 {
-    double flame_x=getX(), flame_y=getY();
-    Direction dir=getDirection();
-    bool flag=false;
-    for(int i=0;i<3;i++)
+    if(flame_count>0)
     {
-        //IF position of the flame is valid
-        if(getNewPositionWithDir(dir, flame_x, flame_y))
+        flame_count--;
+        double flame_x=getX(), flame_y=getY();
+        Direction dir=getDirection();
+        bool flag=false;
+        for(int i=0;i<3;i++)
         {
-            //No Exits or Walls block the flame
-            if(!getWorld()->isFlameBlockedAt(flame_x, flame_y))
+            //IF position of the flame is valid
+            if(getNewPositionWithDir(dir, flame_x, flame_y))
             {
-                flag=true;
-                getWorld()->addActor(new Flame(getWorld(),flame_x,flame_y,up));
+                //No Exits or Walls block the flame
+                if(!getWorld()->isFlameBlockedAt(flame_x, flame_y))
+                {
+                    flag=true;
+                    getWorld()->addActor(new Flame(getWorld(),flame_x,flame_y,up));
+                }
             }
+            //There exist objects blocking the flame
+            else break;
         }
-        //There exist objects blocking the flame
-        else break;
+        if(flag) getWorld()->playSound(SOUND_PLAYER_FIRE);
+        
     }
-    if(flag) getWorld()->playSound(SOUND_PLAYER_FIRE);
 }
 
 void Penelope::useLandmine()
 {
     if(mine_count>0)
-    getWorld()->addActor(new Landmine(getWorld(),getX(),getY()));
-    mine_count--;
+    {
+        getWorld()->addActor(new Landmine(getWorld(),getX(),getY()));
+        mine_count--;
+    }
 }
 
 void Penelope::useExitIfAppropriate(Exit* exit)
