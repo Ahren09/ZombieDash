@@ -861,9 +861,9 @@ Direction SmartZombie::pickDirection(double x, double y, double target_x, double
     
     if(direction_pool.size()==1)
     {
-        return direction_pool[0];
+        return getDirectionByNum(direction_pool[0]);
     }
-    else return direction_pool[randInt(0,1)];
+    else return getDirectionByNum(direction_pool[randInt(0,1)]);
     
 }
 
