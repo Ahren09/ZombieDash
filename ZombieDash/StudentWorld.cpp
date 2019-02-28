@@ -22,7 +22,6 @@ StudentWorld::StudentWorld(string assetPath)
 {
     citizen_count=0;
     zombie_count=0;
-    infect_count=0;
 }
 
 StudentWorld::~StudentWorld()
@@ -152,8 +151,10 @@ int StudentWorld::move()
             (*it)->doSomething();
         
         //Penelope dies
-        if(getLives()==0)
+        if(!pene->isAlive())
         {
+            decLives();
+            playSound(SOUND_PLAYER_DIE);
             return GWSTATUS_PLAYER_DIED;
         }
     }
@@ -222,8 +223,10 @@ void StudentWorld::useExit(Exit* exit)
 bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance)
 {
     double dist;
-    distance=INT_MAX;
-    double target_x=INT_MAX,target_y=INT_MAX;
+    double target_x=pene->getX(),target_y=pene->getY();
+    distance=(x-target_x)*(x-target_x)+(y-target_y)*(y-target_y);
+    //double p_x=pene->getX(),p_y=pene->getY();
+    
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
         if((*it)->canInfectByVomit())
@@ -238,6 +241,7 @@ bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target,
             }
         }
     }
+    
     return distance<=100;
     
 }
@@ -344,7 +348,7 @@ void StudentWorld::writeStatus()
     oss<<"Mines:  "<<pene->getNumLandmines()<<"  ";
     
     //Display Number of infected citizens
-    oss<<"Infected: "<<infect_count;
+    oss<<"Infected: "<<pene->getInfectionCount();
     
     setGameStatText(oss.str());
     

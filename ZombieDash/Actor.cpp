@@ -161,6 +161,7 @@ void Vomit::doSomething()
     {
         decCount();
         getWorld()->activateOnAppropriateActors(this);
+        activateIfAppropriate(getWorld()->getPenelope());
     }
     else setDead();
 }
@@ -171,7 +172,6 @@ void Vomit::activateIfAppropriate(Actor *a)
     if(a->canInfectByVomit() && getWorld()->checkOverlapByTwoObjects(this, a))
     {
         a->setInfectionStatus();
-        getWorld()->increaseInfectCount();
     }
 }
 
@@ -246,6 +246,7 @@ void Goodie::pickUp(Penelope *p)
 {
     setDead();
     getWorld()->playSound(SOUND_GOT_GOODIE);
+    getWorld()->increaseScore(50);
     
 }
 
@@ -309,7 +310,6 @@ void Human::doSomething()
     if(getInfectedStatus())
     {
         infectionCount++;
-        
     }
 }
 
@@ -329,7 +329,6 @@ void Penelope::doSomething()
     if(getInfectionCount()>=500)
     {
         setDead();
-        getWorld()->playSound(SOUND_PLAYER_DIE);
         return;
     }
     
