@@ -116,7 +116,7 @@ void Pit::doSomething()
 
 void Pit::activateIfAppropriate(Actor* a)
 {
-    if(a->canKillByFlameAndPit() && getWorld()->checkOverlapByTwoObjects(this, a) && isAlive())
+    if(a->isAlive() && a->canKillByFlameAndPit() && getWorld()->checkOverlapByTwoObjects(this, a))
     {
         a->dieByFallOrBurnIfAppropriate();
     }
@@ -194,7 +194,6 @@ void Landmine::activateIfAppropriate(Actor* a)
     if(this!=a && getWorld()->checkOverlapByTwoObjects(this, a))
     {
         dieByFallOrBurnIfAppropriate();
-        return;
     }
 }
 

@@ -222,8 +222,7 @@ void StudentWorld::triggerLandmineIfAppropriate(Landmine* landmine)
     {
         if(landmine->isAlive())
         {
-            if((*it)!=landmine)
-                landmine->activateIfAppropriate(*it);
+            landmine->activateIfAppropriate(*it);
         }
         else break;
     }
