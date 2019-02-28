@@ -237,6 +237,7 @@ void StudentWorld::useExit(Exit* exit)
     }
 }
 
+//x, y indicate location of new Vomit
 bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance)
 {
     double dist;
@@ -266,8 +267,11 @@ bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target,
 bool StudentWorld::locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const
 {
     double dist;
-    distance=INT_MAX;
     
+    //Compute distance to Penelope - Default
+    target_x=pene->getX();
+    target_y=pene->getY();
+    distance=(zombie_x-target_x)*(zombie_x-target_x)+(zombie_y-target_y)*(zombie_y-target_y);
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
         if((*it)->canInfectByVomit())
@@ -351,9 +355,15 @@ void StudentWorld::writeStatus()
     ostringstream oss;
     
     //Display Score
-    oss<<"Score: ";
+    int score=getScore();
+    if(score<0)
+    {
+        oss<<"Score:-";
+        score=-score;
+    }
+    else oss<<"Score: ";
     oss.fill('0');
-    oss<<setw(6)<<getScore()<<"  ";
+    oss<<setw(6)<<score<<"  ";
     
     //Display Level
     oss<<"Level:  "<<getLevel()<<"  ";

@@ -142,7 +142,7 @@ void Flame::doSomething()
 //Set Agents that overlap with Flame to dead
 void Flame::activateIfAppropriate(Actor* a)
 {
-    if(a->canKillByFlameAndPit() && getWorld()-> checkOverlapByTwoObjects(this, a))
+    if(a->isAlive() && a->canKillByFlameAndPit() && getWorld()-> checkOverlapByTwoObjects(this, a))
     {
         a->dieByFallOrBurnIfAppropriate();
     }
@@ -176,7 +176,7 @@ void Vomit::activateIfAppropriate(Actor *a)
 
 Landmine::Landmine(StudentWorld* gw, double startX, double startY)
 :ActivatingObject(gw, IID_LANDMINE, startX, startY, right, 1),
-activation_count(30),activation_status(false)
+activation_count(90),activation_status(false)
 {}
 
 void Landmine::doSomething()
@@ -191,7 +191,7 @@ void Landmine::doSomething()
 
 void Landmine::activateIfAppropriate(Actor* a)
 {
-    if(getWorld()->checkOverlapByTwoObjects(this, a))
+    if(this!=a && getWorld()->checkOverlapByTwoObjects(this, a))
     {
         dieByFallOrBurnIfAppropriate();
         return;
@@ -202,6 +202,9 @@ void Landmine::activateIfAppropriate(Actor* a)
 //Introduce surrounding flames and create pit
 void Landmine::dieByFallOrBurnIfAppropriate()
 {
+    //Set status to dead
+    setDead();
+    
     getWorld()->playSound(SOUND_LANDMINE_EXPLODE);
     int x=getX();
     int y=getY();
@@ -221,8 +224,6 @@ void Landmine::dieByFallOrBurnIfAppropriate()
     //Introduce a pit at location of Landmine;
     getWorld()->addActor(new Pit(getWorld(),x,y));
     
-    //Set status to dead
-    setDead();
 }
 
 
@@ -719,7 +720,7 @@ bool Zombie::vomitIfAppropriate(const double& x, const double& y)
     return false;
 }
 
-//TODO: Use bool here?
+//New direction already determined, move along this new position
 void Zombie::moveToNewPosition()
 {
     Direction dir=getDirection();
@@ -780,13 +781,14 @@ void Zombie::doSomething()
         //If zombie vomits
         if(vomitIfAppropriate(vomit_x, vomit_y))
             return;
+        //ELSE attempt move
     }
     
     if(getMoves() == 0)
     {
         setNewMoves();
     }
-    //function overriden in SmartZombie
+    
     setNewDirection();
     moveToNewPosition();
     
@@ -822,10 +824,13 @@ void SmartZombie::setNewDirection()
     Actor* target;
     bool isThreat = false;
     double target_x=INT_MAX, target_y=INT_MAX;
+    
+    //IF nearest target is less than/equal to 80px
     if(getWorld()->locateNearestCitizenTrigger(getX(), getY(), target_x, target_y, target, distance, isThreat))
     {
         setDirection(pickDirection(getX(),getY(),target_x,target_y));
     }
+    //ELSE nearest target is more than 80px, choose random position among the 4
     else Zombie::setNewDirection();
 }
 

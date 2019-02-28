@@ -57,8 +57,8 @@ public:
     
     int computeDistance(double a_x, double a_y, double b_x, double b_y)
     {
-        double d_x=abs(a_x-b_x);
-        double d_y=abs(a_y-b_y);
+        double d_x=a_x-b_x;
+        double d_y=a_y-b_y;
         return d_x * d_x + d_y * d_y;
     }
     
