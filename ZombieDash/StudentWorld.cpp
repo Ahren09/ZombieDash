@@ -300,11 +300,21 @@ bool StudentWorld::locateNearestCitizenThreat(double citizen_x, double citizen_y
     
 }
 
+//Determine whether attempted move is blocked
+bool StudentWorld::isBlocked(double a_x, double a_y, double c_x, double c_y) const
+{
+    double b_x=a_x+SPRITE_WIDTH-1, b_y=a_y+SPRITE_HEIGHT-1;
+    double d_x=c_x+SPRITE_WIDTH-1, d_y=c_y+SPRITE_HEIGHT-1;
+    return !(a_x>d_x || b_x<c_x || a_y>d_y || b_y<c_y);
+    
+}
+
 bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
 {
     for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if((*it)->blocksAgent() && checkOverlapByOneObject(x, y,(*it)) && (*it)!=ag)
+        //TODO:
+        if((*it)->blocksAgent() && isBlocked(x,y,(*it)->getX(), (*it)->getY()) && (*it)!=ag)
         {
             return true;
         }

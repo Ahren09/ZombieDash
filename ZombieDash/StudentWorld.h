@@ -101,6 +101,9 @@ public:
     //returns true if there is agent blocking ag
     bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;
     
+    //Determine whether attempted move is blocked
+    bool isBlocked(double a_x, double a_y, double c_x, double c_y) const;
+    
     void useExit(Exit* exit);
     
     //Get Citizen's distance to Penelope, returns true if less than 80
@@ -113,6 +116,7 @@ public:
     }
     
     void writeStatus();
+    
     
    
     

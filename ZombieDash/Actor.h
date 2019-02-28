@@ -73,6 +73,8 @@ public:
     bool getNewPositionWithDir(Direction dir, double& x, double& y);
 
     Direction getDirectionByNum(int n);
+    
+    
 private:
     
     StudentWorld* m_world;
