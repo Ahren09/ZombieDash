@@ -29,7 +29,7 @@
 			<key>uniqueIdentifier</key>
 			<string>00587556-3CEF-4F62-87CB-1FCF715778BD</string>
 		</dict>
-		<key>6629C9EC-0C8B-422A-B6DE-127D531A328E</key>
+		<key>BB550FF8-C0A1-4F9F-8BDA-900EC0074C5D</key>
 		<dict>
 			<key>className</key>
 			<string>IDEActivityLogSection</string>
@@ -38,19 +38,42 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.target.product-type.tool</string>
 			<key>fileName</key>
-			<string>6629C9EC-0C8B-422A-B6DE-127D531A328E.xcactivitylog</string>
+			<string>BB550FF8-C0A1-4F9F-8BDA-900EC0074C5D.xcactivitylog</string>
 			<key>highLevelStatus</key>
 			<string>W</string>
 			<key>signature</key>
 			<string>ZombieDash-bywfdmpshimffieipoysbnpvlngb</string>
 			<key>timeStartedRecording</key>
-			<real>573093069.90290701</real>
+			<real>573099794.94844902</real>
 			<key>timeStoppedRecording</key>
-			<real>573093072.53330004</real>
+			<real>573099797.48621297</real>
 			<key>title</key>
 			<string>Build target ZombieDash</string>
 			<key>uniqueIdentifier</key>
-			<string>6629C9EC-0C8B-422A-B6DE-127D531A328E</string>
+			<string>BB550FF8-C0A1-4F9F-8BDA-900EC0074C5D</string>
+		</dict>
+		<key>D60A28DB-F13E-4280-937B-7100FBEA67C4</key>
+		<dict>
+			<key>className</key>
+			<string>IDEActivityLogSection</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.target.product-type.tool</string>
+			<key>fileName</key>
+			<string>D60A28DB-F13E-4280-937B-7100FBEA67C4.xcactivitylog</string>
+			<key>highLevelStatus</key>
+			<string>W</string>
+			<key>signature</key>
+			<string>ZombieDash-cksqsnguebrhdnbnquhelfsyjqql</string>
+			<key>timeStartedRecording</key>
+			<real>573114497.45027804</real>
+			<key>timeStoppedRecording</key>
+			<real>573114500.65823305</real>
+			<key>title</key>
+			<string>Build target ZombieDash</string>
+			<key>uniqueIdentifier</key>
+			<string>D60A28DB-F13E-4280-937B-7100FBEA67C4</string>
 		</dict>
 	</dict>
 	<key>preserveOldLogs</key>

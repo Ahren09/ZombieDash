@@ -15,9 +15,11 @@ public:
     Actor(StudentWorld* gw, int imageID, double startX, double startY, Direction dir = 0, int depth = 0);
     virtual void doSomething()=0;
     
+    //Return a pointer to StudentWorld the Actor is in
     StudentWorld* getWorld() const
     { return m_world; }
     
+    //Check and set Actor's alive status
     bool isAlive() const
     { return aliveStatus; }
     
@@ -31,7 +33,7 @@ public:
     // If this object uses exits, use the exit.
     virtual void useExitIfAppropriate(Exit* exit){}
     
-    // If this object can die by falling into a pit or burning, die.
+    // If this object can die by falling into a pit or burning, then set it dead
     virtual void dieByFallOrBurnIfAppropriate(){}
     
     // Return true if this object can block movement of Agent
@@ -50,6 +52,7 @@ public:
     virtual bool blocksFlame() const
     { return false; }
     
+    //Set a Human's status to infected, ONLY valid for a Human
     virtual void setInfectionStatus(){}
     
     // Return true if this object is a Zombie
@@ -58,6 +61,7 @@ public:
     
     Direction getDirectionByNum(int n);
     
+
     bool determineNewPosition(Direction dir, double& x, double& y, double distance);
     
     //Check whether the new location with regard to the direction specified is still in StudentWorld
@@ -127,9 +131,11 @@ public:
     void doSomething();
     void activateIfAppropriate(Actor* a);
     
+    //Return the time a Flame has persisted
     int getCount()
     { return active_count; }
     
+    //Decrease the time a Flame persists
     void decCount()
     { active_count--; }
     
@@ -163,7 +169,9 @@ public:
     Landmine(StudentWorld* gw, double startX, double startY);
     void doSomething();
     virtual void activateIfAppropriate(Actor* a);
-    virtual void dieByFallOrBurnIfAppropriate(); //Can call explode()
+    
+    //Landmine can be triggered by Flame
+    virtual void dieByFallOrBurnIfAppropriate();
     
 private:
     //return activation status and count down according to ticks
@@ -240,8 +248,10 @@ public:
     int getInfectionCount() const
     { return infectionCount; }
     
-    void setInfectionStatus()
-    { infectedStatus=true; }
+    virtual void setInfectionStatus()
+    {
+        infectedStatus=true;
+    }
     
     virtual void clearInfection()
     {
@@ -312,6 +322,7 @@ public:
     virtual void clearInfection(){}
     void useExitIfAppropriate(Exit* exit);
     virtual void dieByFallOrBurnIfAppropriate();
+    void setInfectionStatus();
     virtual bool moveToPenelope(double p_x, double p_y);
     bool moveAwayFromZombie(double zombie_x, double zombie_y, double dist_z);
     

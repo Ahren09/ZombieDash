@@ -416,7 +416,6 @@ void Penelope::useExitIfAppropriate(Exit* exit)
 {
     if(getWorld()->checkOverlapByTwoObjects(this, exit))
     {
-        
         if(getWorld()->getCitizenCount() == 0)
         {
             getWorld()->recordLevelFinishedIfAllCitizensGone();
@@ -486,6 +485,12 @@ void Citizen::dieByFallOrBurnIfAppropriate()
     getWorld()->playSound(SOUND_CITIZEN_DIE);
     getWorld()->increaseScore(-1000);
     getWorld()->decreaseCitizenCount();
+}
+
+void Citizen::setInfectionStatus()
+{
+    Human::setInfectionStatus();
+    getWorld()->playSound(SOUND_CITIZEN_INFECTED);
 }
 
 bool Citizen::moveToPenelope(double p_x, double p_y)

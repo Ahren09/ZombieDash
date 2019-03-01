@@ -1,17 +1,301 @@
 
+############################################################
 
-All Goodies have depth=1.0
+//   Description: Actor
+
+############################################################
+
+My design of Object Hierarchy
+
+GraphObject
+    Actor
+        Wall
+        ActivatingObject
+            Exit
+            Pit
+            Flame
+            Vomit
+            Landmine
+            Goodie
+                VaccineGoodie
+                GasCanGoodie
+                LandmineGoodie
+        Agent
+            Human
+                Penelope
+                Citizen
+            Zombie
+                DumbZombie
+                SmartZombie
 
 
-The following two are not needed in ActivatingObject class
-	virtual ~ActivatingObject();
-	virtual void doSomething();
+*******
+Actor
+*****
 
-Since the function that calls it passes in an Actor*
-setInfectionStatus() must be defined in Actor class(which can be pure virtual function)
-It can be redefined in Human class
+Actor(StudentWorld* gw, int imageID, double startX, double startY, Direction dir = 0, int depth = 0);
+	Constructor of all Actor objects 
+
+	NOTICE that I didn't declare destructors for the class since the only pointer contained in an Actor object is a StudentWorld*. Since all Actors share the same StudentWorld, and StudentWorld has its own destructor, the compiler generated destructor will do its work correctly.
+    	
+
+   //Check and set Actor's alive status
+   bool isAlive() const
+   virtual void setDead()
+
+	NOT set to virtual function since setting an Actor to dead and checking its alive status are the same for all Actors. Overriding is not required.
 
 
+   //Return a pointer to StudentWorld the Actor is in
+   StudentWorld* getWorld() const
+
+	NOT set to virtual function since all Actor objects have a pointer to its StudentWorld. Overriding not needed
+
+
+   // Return true if this object can block movement of Agent
+   virtual bool blocksAgent() const
+
+	It is declared as virtual since only Wall and Agents can block other Agents from moving onto them
+	We need to override it in other functions
+
+
+
+   //Set a Human's status to infected, ONLY valid for a Human
+    virtual void setInfectionStatus();
+
+	It is declared as virtual since only Human has infection status. However, if we are to iterate through all the objects in the list of Actor pointers, we need to provide an empty implementation for all Actor types in the pointer list.
+
+	
+    
+    // If this is an activated object, perform its effect on a (e.g., for an
+    // Exit have a use the exit).
+    virtual void activateIfAppropriate(Actor* a);
+	
+	It is declared as virtual since each Actor class perform their respective actions on all other objects. I override this function in each Actor class that perform a unique action on all other Actor objects.
+    
+
+    // If this object uses exits, use the exit.
+    virtual void useExitIfAppropriate(Exit* exit);
+	
+	It is declared as virtual since only Human can use Exit. However, if we are to iterate through all the objects in the list of Actor pointers, we need to provide an empty implementation for all Actor types in the pointer list.
+    
+
+    // If this object can die by falling into a pit or burning, then set it dead
+    virtual void dieByFallOrBurnIfAppropriate(){}
+    
+	It is declared as virtual since all Actors can die by falling into Pit and . However, if we are to iterate through all the objects in the list of Actor pointers, we need to provide an empty implementation for all object types in the pointer list. 
+	
+
+
+    // Return true if this object is a Zombie
+    virtual bool isZombie()
+
+	Obviously only Zombie objects should return true
+
+    //Check whether the new location with regard to the direction specified is still in StudentWorld
+    //Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
+    //Returns true otherwise, and set x,y to new values
+    bool getNewPositionWithDir(Direction dir, double& x, double& y);
+	
+	It is NOT declared as virtual since this function will NOT be overriden in any derived class. 
+
+
+*******
+Wall
+*****
+
+   virtual void doSomething(){};
+	
+	I override this virtual function since Wall cannot be destroyed, nor can it perform any actions/interact with other Actors.
+
+   virtual void setDead(){}
+
+	I override this virtual function since a Wall can never die
+
+   bool blocksFlame(Actor* flame) const
+
+    	I override this virtual function since a Wall blocks flame
+
+   virtual bool canKillByFlameAndPit() const
+   	
+	I override this virtual function since a Wall cannot be killed by Flame or Pit
+    
+   virtual bool blocksAgent() const
+
+	I override this virtual function since a Wall blocks other moving objects from moving onto it
+
+
+*******
+Pit
+*****
+    
+    void doSomething();
+	
+	I override this virtual function since it perform its unique action: check whether there exist any overlapping Agents 
+
+    void activateIfAppropriate(Actor* a);
+	Check whether any object can die by falling into the Pit
+	
+	
+    virtual bool canKillByFlameAndPit() const
+    { return false; }
+
+
+*******
+Flame
+*****
+    void doSomething();
+
+    void activateIfAppropriate(Actor* a);
+
+    //Return the time a Flame has persisted    
+    int getCount()
+    //Decrease the time a Flame persists
+    void decCount()
+	
+	The above two functions are uniquely defined non-virtual functions. They return/count down the lifespan of a Flame - 2 ticks
+    
+    virtual bool canKillByFlameAndPit() const
+
+
+*******
+Vomit
+*****
+
+    Vomit(StudentWorld* gw, double startX, double startY, Direction dir);
+    void doSomething();
+    void activateIfAppropriate(Actor* a);
+    
+    int getCount()
+    { return active_count; }
+    void decCount()
+    { active_count--; }
+
+	The above two functions are uniquely defined non-virtual functions. They return/count down the lifespan of a Vomit - 2 ticks
+
+*******
+Landmine
+*****
+
+    Landmine(StudentWorld* gw, double startX, double startY);
+    void doSomething();
+    virtual void activateIfAppropriate(Actor* a);
+
+    //Landmine can be triggered by Flame
+    virtual void dieByFallOrBurnIfAppropriate();
+	
+	dieByFallOrBurnIfAppropriate() is a virtual function overriden in Landmine class since Landmine can be triggered by Flame
+
+
+*******
+Goodie
+*****
+    Goodie(StudentWorld* gw, int imageID, double startX, double startY);
+    virtual void doSomething();
+    virtual void activateIfAppropriate(Actor* a);
+    void dieByFallOrBurnIfAppropriate()
+
+    virtual void pickUp(Penelope* p);
+	
+	pickUp() is a uniquely defined non-virtual function in Goodie class since only Goodies can be picked up by Penelope
+	Also, since all Goodies perform the same actions when are picked up by Penelope (except that they increase respective count numbers), they can derive the same pickUp() function
+
+***********************************
+NOTICE THAT:
+When I compile, I got the error message:
+
+ "vtable for GasCanGoodie", referenced from:
+      GasCanGoodie::GasCanGoodie(StudentWorld*, double, double) in Actor.o
+  NOTE: a missing vtable usually means the first non-inline virtual member function has no definition.
+
+The reason is that I declared doSomething() within the three Goodie class. I should NOT declare doSomething() again if I am not to redefine doSomething() inside the 3 Goodie classes in Actor.h. Otherwise, the compiler expects that I provide a new implementation of doSomething(), which can NOT be empty.
+***********************************
+
+*******
+Agent
+*****
+
+    Agent(StudentWorld* gw, int imageID, double startX, double startY);
+
+    virtual bool blocksAgent() const
+	This is an overriden virtual function since, different from its default behavior in Actor class, all Agents can block other agents from moving onto it.
+
+
+*******
+Human
+*****
+
+    Human(StudentWorld* gw, int imageID, double startX, double startY);
+
+    virtual void doSomething();
+    
+    bool getInfectedStatus() const
+    int getInfectionCount() const
+    virtual void setInfectionStatus()
+    virtual void clearInfection()
+    virtual bool canInfectByVomit() const
+
+*******
+Penelope
+*****
+    Penelope(StudentWorld* gw, double startX, double startY);
+    virtual void doSomething();
+    
+    virtual void dieByFallOrBurnIfAppropriate();
+	This is an overriden virtual function since if Penelope dies, we immediately return, stop the game process and decline remaining lives.
+
+    
+    // Increase the number of vaccines the object has.
+    void increaseVaccines()
+        
+    // Increase the number of flame charges the object has.
+    void increaseFlameCharges()
+        
+    // Increase the number of landmines the object has.
+    void increaseLandmines()
+        
+    // How many vaccines does the object have?
+    int getNumVaccines() const
+        
+    // How many flame charges does the object have?
+    int getNumFlameCharges() const
+        
+    // How many landmines does the object have?
+    int getNumLandmines() const
+
+    void useVaccine();
+    void fireGasCan();
+    void useLandmine();
+    void useExitIfAppropriate(Exit* exit);
+
+	These functions are uniquely defined non-virtual functions in Penelope class since only Penelope can pick up, manipulate and use goodies.
+
+    void moveToPosition(double x, double y, Direction dir);
+
+*******
+Citizen
+*****
+
+    Citizen(StudentWorld* gw, double startX, double startY);
+    virtual void doSomething();
+    virtual void clearInfection(){}
+    void useExitIfAppropriate(Exit* exit);
+    virtual void dieByFallOrBurnIfAppropriate();
+    void setInfectionStatus();
+    virtual bool moveToPenelope(double p_x, double p_y);
+    bool moveAwayFromZombie(double zombie_x, double zombie_y, double dist_z);
+    
+    //Returns true if Citizen is on the same row/col as Penelope
+    bool pickDirection(double x, double y, double target_x, double target_y,std::vector<int>& direction_pool);
+    
+    //Returns true if Move is successful
+    bool pickEscapeDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool, std::vector<double>& dist_pool, double current_dist_z);
+    
+    //Create a new Zombie at the same location as Citizen
+    virtual void turnIntoZombie();
+
+***********************************
+NOTICE THAT:
 I was thinking of putting clearInfection() in Penelope class, since a citizen's infection
 status cannot be cleared once it's infected
 
@@ -29,72 +313,241 @@ void clearInfection()
 {}
 
 so that a Citizen's infection status will never be erased accidentally
+***********************************
 
 
-Here is my initialization of a function that computes location with respect to direction
-an actor is facing
-bool StudentWorld::getNewPositionWithDir(Direction dir, double& x, double& y)
-{
-    if( dir==Actor::left || dir == Actor::right )
-        return determineNewPosition(dir, x, y, SPRITE_WIDTH);
-    else return determineNewPosition(dir, x, y, SPRITE_HEIGHT);
-}
+*******
+Zombie
+*****
 
-Since we see that left/right/up/down are const int defined in GraphObject, "Actor::" must
-be added to indicate that
+    Zombie(StudentWorld* gw, double startX, double startY);
+    virtual void doSomething();
+    virtual void computeVomitPosition(double& x,double& y);
+    virtual bool vomitIfAppropriate(const double& x, const double& y);
+    virtual void moveToNewPosition();
+    virtual void dieByFallOrBurnIfAppropriate();
+    virtual void setNewDirection();
+    
+    virtual bool isZombie()
+    
+    int getMoves()
+
+    void setMoves(int n)
+    
+    void decreaseMoves()
+    
+    virtual void setNewMoves()
+
+*******
+DumbZombie
+*****
+    DumbZombie(StudentWorld* gw, double startX, double startY);
+    virtual void dieByFallOrBurnIfAppropriate();
+
+*******
+SmartZombie
+*****
+
+    SmartZombie(StudentWorld* gw, double startX, double startY);
+    virtual void dieByFallOrBurnIfAppropriate();
+    virtual void setNewDirection();
+    Direction pickDirection(double x, double y, double target_x, double target_y);
+
+############################################################
+
+//   Description: StudentWorld
+
+############################################################
+
+StudentWorld(std::string assetPath)
+    	The constructor constructs a new StudentWorld object containing an empty list of Actor pointers, a null pointer to Penelope. Citizen count and Zombie count are initialized to 0
 
 
-//###############
+
+~StudentWorld()
+    	The compiler-generated destructor would not properly delete all actors when the StudentWorld object is destroyed, since we store an array of dynamically allocated actors in StudentWorld. The destructor calls StudentWorld::cleanUp() to delete all actors. 
+
+
+
+init()
+	This loads information from the level data file.
+
+move()
+	This calls the doSomething() in each alive Actors and check the alive status of Penelope. It removes dead Actors and free their memory.
+
+
+
+virtual void cleanUp()
+    	This deletes all actors, including Penelope, and sets Penelope's pointer to nullptr so that this function can be called multiple times. 
+
+
+
+void addActor(Actor* newActor)
+    	This takes a pointer to a newly constructed Actor and adds it to the list of Actor pointers. This function is not virtual. It does not inherit GameWorld class. It is in the StudentWorld class. Each Actor can call this function to create new Actors in the StudentWorld.
+
+
+
+int getCitizenCount() const
+void decreaseCitizenCount()
+int getZombieCount() const
+void increaseZombieCount()
+void decreaseZombieCount()
+	These functions are called by objects of Actor class to modify number of Zombies and Citizens in StudentWorld
+
+
+
+Penelope* getPenelope() const
+	Returns a pointer to Penelope so that the caller can manipulate it.
+
+
+
+void recordLevelFinishedIfAllCitizensGone()
+	Called by useExitIfAppropriate() of Penelope class to indicate StudentWorld that all Citizens are gone and current level is finished.
+
+
+
+void activateOnAppropriateActors(Actor* a)
+	For each actor overlapping a, activate a if appropriate.
+
+
+
+void introduceFlameIfAppropriate(double x, double y);
+	Try to introduce a Flame object with specified coordinates
+ 
+
+
+bool isFlameBlockedAt(double x, double y) const;
+	Check whether creation of a flame is blocked at the indicated location
+
+
+
+int computeDistance(double a_x, double a_y, double b_x, double b_y) const;
+	Compute distance between two points
+  
+  
+
+bool checkOverlap(double a_x, double a_y, double b_x, double b_y) const;
+    
+bool checkOverlapByOneObject(double x, double y, Actor* other) const
+    
+bool checkOverlapByTwoObjects(Actor* me, Actor* other) const
+
+	All are functions that check whether the two Objects overlap
+
+
+
+bool checkValidPosition(double& x, double& y)
+	Check whether the specified position is out of bound
+
+
+
+bool locateNearestVomitTrigger(double x, double y, Actor* &target, double& distance)
+	Called by Zombie
+	Locate nearest Citizen or Penelope that can cause zombie to vomit. Returns true if Zombie is triggered to vomit
+
+
+
+
+bool locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const;
+	Called by Zombie
+	Locate nearest Citizen or Penelope that can cause a Zombie to move closer. Returns true if Zombie decides to move along this direction
+
+
+
+bool locateNearestCitizenThreat(double x, double y, double& otherX, double& otherY, double& distance);
+	Called by Citizen
+	Locate nearest Zombie that can cause Citizen to move. Returns true if the nearest Zombie is within 80px
+    
+
+
+bool isBlocked(double a_x, double a_y, double c_x, double c_y) const;
+	Determine whether an attempted move is blocked
+
+
+
+bool isAgentMovementBlockedAt(Agent* ag, double x, double y) const;
+	Returns true if there is some objects blocking the movement of the Agent
+
+
+	
+bool getPenelopeDist(double x, double y, double& p_x, double& p_y, double& dist_p)
+	Citizen's distance to Penelope, set p_x and p_y to Penelope's position
+	return true if distance less than 80px
+
+############################################################
+// NOTIFICATIONS
+############################################################
+
 To iterate through a list within a const function, we must use a const iterator since the
 compiler assumes that we do NOT alter the list.
 for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
 
 
-//###############
-Format of using a reference to a pointer
-'*' should be placed before '&'
-For example, if we are to declare an Actor pointer:
-	Actor* &a
+I place all playSound() inside respective Actor class because if playSound() are called in StudentWorld, we need extra variables to store which sounds to play within each iteration
 
-//###############
-About Consolidating functions
-//Set all Actors burned by Flame to dead
-void killByFlameIfAppropriate(Flame* flame);
-    
-//Set all Agent falling into Pit to dead
-void killByPitIfAppropriate(Pit* pit);
+############################################################
+
+//   Testing:
+
+############################################################
+
+*******
+Actor
+    I tested the Actor class by observing the behavior of its derived classes. All Actors are displayed correctly and derived the common behaviors
+
+*******
+Wall
+    I tested the Wall class by starting the game and noting that Walls appear in the correct locations. The Walls also do not allow Zombies, Citizens, or Penelope to intersect with their bounding boxes. Wall are not destroyed by flames or infected by vomit.
+
+*******
+Exit
+    I tested the Exit class by playing the game and observing that Citizens will use the Exit when they overlap with it, but Penelope will not use the Exit until all Citizens are dead or exited. Also, Exits block Flames as I use Penelope's flamethrower and landmine. Moreover, Exits are neither destroyed by Flame nor infected by Vomits
+
+*******
+Pit
+    I tested the Pit class by observing that it correctly destroyed overlapping Citizens, Zombies, and Penelope. Also Pits do not block movement or Flames, nor are they destructed by Flames.
+
+*******
+Flame
+    I tested the Flame class by playing the game and using the flamethrower and landmines. Flames correctly destroy overlapping Zombies, Citizens, Goodies, Landmines, and Penelope.
+
+*******
+Vomit
+    I tested the Vomit class by playing the game and letting zombies to Vomit on Penelope
+    and Citizens. I noted that Vomit correctly infects Citizens and Penelope.
+
+*******
+Goodie
+    I tested the Goodie class by observing the behavior of its derived classes. In particular, all Goodies correctly determine overlap with Penelope and are picked up correctly. All goodies are also destroyed by flames. Moreover, all goodies do not block movement and increase the score by 50 when they are picked up by Penelope
+
+VaccineGoodie
+    I observed that it correctly increases the number of vaccines Penelope is carrying by 1
+GasCanGoodie
+    I observe that it correctly increases the number of flamethrower charges Penelope has by 5
+LandmineGoodie
+    I observe that it correctly increases the number of landmines Penelope is carrying by 2.
+
+*******
+Landmine
+    I tested the Landmine class by setting Landmines. I observed that Landmine triggers when a Penelope, Zombie, or Citizen walks over it, or when destroyed by flame. I noted that Landmines correctly creates Flames and a Pit, They are only triggered after 30 ticks (or 1.5 secs) after they are set.
+
+*******
+Human
+    I tested the Human class by observing that all Human except Penelope are paralyzed every other tick. Penelope and Citizens can be infected. Human move correctly according to their respective behaviors.
+
+*******
+Penelope
+    I tested the Penelope class by tapping each keyboard command. I observed that Penelope can be infected, and that Penelope can fall into Pits. Penelope can be destroyed by flames. I also verified that Penelope can only use Goodies with positive counts, and the counts can never go minus.
+
+*******
+Citizen
+    I tested the Citizen class by playing the game and observing the Citizens. The Citizens correctly follow Penelope and run away from zombies, and they correctly get killed/destroyed in the appropriate ways.
+
+*******
+DumbZombie
+    I tested the DumbZombie class by observing that it correctly vomits, gets destroyed, and pick directions. DumbZombies give the right number of points(1000) and may leave a VaccineGoodie upon death.
 
 
-Since they all operate on StudentWorld class,
-void activateOnAppropriateActors(Actor* a);
-
-
-I place all playSound() inside respective Actor class
-
-
-//###############
-If we define a virtual function inside a base class, we must provide an empty implementation 
-
-For example:
-virtual void activateIfAppropriate(Actor* a);
-
-If in some classes, we are not overriding activateIfAppropriate(), we can write:
-virtual void activateIfAppropriate(Actor* a){}
-inside base class
-
-//###############
-I define a doSomething() in Goodie class, which call their respective pickup(Penelope* p)
-
-When I compile, I got the error message:
-
- "vtable for GasCanGoodie", referenced from:
-      GasCanGoodie::GasCanGoodie(StudentWorld*, double, double) in Actor.o
-  NOTE: a missing vtable usually means the first non-inline virtual member function has no definition.
-
-
-I should NOT declare doSomething() again if I am not to redefine doSomething() inside the 3 Goodie classes in Actor.h. Otherwise, the compiler expects that I provide a new implementation of doSomething(), which can NOT be empty.
-
-
-//###############
-
-I used a vector to score the potential direction of Agents
+*******
+SmartZombie
+    I tested the SmartZombie class by observing that SmartZombies correctly vomits, gets destroyed, pick directions with regard to Citizen and Penelope. They give 2000 points upon death and never drop VaccineGoodies.

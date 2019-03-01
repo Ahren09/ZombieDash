@@ -18,7 +18,7 @@ GameWorld* createStudentWorld(string assetPath)
 // Students:  Add code to this file, StudentWorld.h, Actor.h and Actor.cpp
 
 StudentWorld::StudentWorld(string assetPath)
-: GameWorld(assetPath),gameFinished(false)
+: GameWorld(assetPath),gameFinished(false),citizen_count(0),zombie_count(0),pene(nullptr)
 {}
 
 StudentWorld::~StudentWorld()
@@ -35,6 +35,7 @@ int StudentWorld::init()
     citizen_count=0;
     zombie_count=0;
     gameFinished=false;
+    isEvenTick=true;
     
     Level lev(assetPath());
     //Create string containing name of file
@@ -126,14 +127,14 @@ int StudentWorld::init()
 }
 
 //##########################
-//MARK: Move
+//MARK: move
 //##########################
 
 int StudentWorld::move()
 {
     isEvenTick=!isEvenTick;
-    writeStatus();
-    //move all Actors in a for-loop
+    
+    //All Actors attempt one move
     if(getLives()>0)
         pene->doSomething();
     for(list<Actor*>::iterator it=m_actors.begin(); it!=m_actors.end(); it++)
@@ -150,8 +151,8 @@ int StudentWorld::move()
         }
     }
     
-    //if citizen Penelope has escaped
-    if(citizen_count==0 && gameFinished)
+    //if all Citizens and Penelope have escaped
+    if(gameFinished)
     {
         playSound(SOUND_LEVEL_FINISHED);
         return GWSTATUS_FINISHED_LEVEL;
@@ -167,6 +168,9 @@ int StudentWorld::move()
             m_actors.erase(it);
         }
     }
+    
+    writeStatus();
+    
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -222,7 +226,7 @@ bool StudentWorld::isFlameBlockedAt(double x, double y) const
     return flag;
 }
 
-int StudentWorld::computeDistance(double a_x, double a_y, double b_x, double b_y)
+int StudentWorld::computeDistance(double a_x, double a_y, double b_x, double b_y) const
 {
     double d_x=a_x-b_x;
     double d_y=a_y-b_y;
