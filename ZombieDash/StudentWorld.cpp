@@ -19,19 +19,19 @@ GameWorld* createStudentWorld(string assetPath)
 
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath),gameFinished(false)
-{
-    citizen_count=0;
-    zombie_count=0;
-}
+{}
 
 StudentWorld::~StudentWorld()
 {
     cleanUp();
 }
 
+//##########################
+//MARK: init
+//##########################
+
 int StudentWorld::init()
 {
-    
     citizen_count=0;
     zombie_count=0;
     gameFinished=false;
@@ -118,28 +118,20 @@ int StudentWorld::init()
                         m_actors.push_back(actor);
                         zombie_count++;
                     }break;
-                        
-                    
-                    
                 }
-                
-                
             }
-            
         }
-        
-        
     }
     return GWSTATUS_CONTINUE_GAME;
 }
 
 //##########################
-//MARK: - Move
+//MARK: Move
 //##########################
 
 int StudentWorld::move()
 {
-    updateTick();
+    isEvenTick=!isEvenTick;
     writeStatus();
     //move all Actors in a for-loop
     if(getLives()>0)
@@ -175,25 +167,33 @@ int StudentWorld::move()
             m_actors.erase(it);
         }
     }
-    
     return GWSTATUS_CONTINUE_GAME;
-    
 }
+
+//##########################
+//MARK: cleanUp
+//##########################
+
+void StudentWorld::cleanUp()
+{
+    for(std::list<Actor*>::iterator it=m_actors.begin();it != m_actors.end();it++)
+    {
+        delete *it;
+        (*it) = nullptr;
+    }
+    m_actors.erase(m_actors.begin(),m_actors.end());
+    delete pene;
+    pene=nullptr;
+}
+
+//##########################
+//MARK: - public functions
+//##########################
 
 //Check whether the given position is in StudentWorld
 //AND NOT being blocked by an exit or a Wall
-bool StudentWorld::isFlameBlockedAt(double x, double y) const
-{
-    bool flag=false;
-    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
-    {
-        if((*it)->blocksFlame() && checkOverlapByOneObject(x, y, (*it)))
-            flag=true;
-    }
-    return flag;
-}
 
-//
+
 void StudentWorld::activateOnAppropriateActors(Actor* a)
 {
     a->activateIfAppropriate(pene);
@@ -211,26 +211,29 @@ void StudentWorld::introduceFlameIfAppropriate(double x, double y)
     }
 }
 
-void StudentWorld::triggerLandmineIfAppropriate(Landmine* landmine)
+bool StudentWorld::isFlameBlockedAt(double x, double y) const
 {
-    landmine->activateIfAppropriate(pene);
-    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+    bool flag=false;
+    for(list<Actor*>::const_iterator it=m_actors.begin();it!=m_actors.end();it++)
     {
-        if(landmine->isAlive())
-        {
-            landmine->activateIfAppropriate(*it);
-        }
-        else break;
+        if((*it)->blocksFlame() && checkOverlapByOneObject(x, y, (*it)))
+            flag=true;
     }
-    
+    return flag;
 }
-void StudentWorld::useExit(Exit* exit)
+
+int StudentWorld::computeDistance(double a_x, double a_y, double b_x, double b_y)
 {
-    pene->useExitIfAppropriate(exit);
-    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
-    {
-        (*it)->useExitIfAppropriate(exit);
-    }
+    double d_x=a_x-b_x;
+    double d_y=a_y-b_y;
+    return d_x * d_x + d_y * d_y;
+}
+
+bool StudentWorld::checkOverlap(double a_x, double a_y, double b_x, double b_y) const
+{
+    double d_x=abs(a_x-b_x);
+    double d_y=abs(a_y-b_y);
+    return d_x * d_x + d_y * d_y <=100;
 }
 
 //x, y indicate location of new Vomit
@@ -255,9 +258,7 @@ bool StudentWorld::locateNearestVomitTrigger(double x, double y, Actor* &target,
             }
         }
     }
-    
     return distance<=100;
-    
 }
 
 bool StudentWorld::locateNearestCitizenTrigger(double zombie_x, double zombie_y, double& target_x, double& target_y, Actor* target, double& distance, bool& isThreat) const
@@ -300,10 +301,8 @@ bool StudentWorld::locateNearestCitizenThreat(double citizen_x, double citizen_y
     {
         if((*it)->isZombie())
         {
-            
             x=(*it)->getX();
             y=(*it)->getY();
-            
             double distance=(citizen_x-x)*(citizen_x-x)+(citizen_y-y)*(citizen_y-y);
             if(distance<dist_z)
             {
@@ -314,7 +313,6 @@ bool StudentWorld::locateNearestCitizenThreat(double citizen_x, double citizen_y
         }
     }
     return dist_z<=6400;
-    
 }
 
 //Determine whether attempted move is blocked
@@ -323,7 +321,6 @@ bool StudentWorld::isBlocked(double a_x, double a_y, double c_x, double c_y) con
     double b_x=a_x+SPRITE_WIDTH-1, b_y=a_y+SPRITE_HEIGHT-1;
     double d_x=c_x+SPRITE_WIDTH-1, d_y=c_y+SPRITE_HEIGHT-1;
     return !(a_x>d_x || b_x<c_x || a_y>d_y || b_y<c_y);
-    
 }
 
 bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
@@ -342,7 +339,36 @@ bool StudentWorld::isAgentMovementBlockedAt(Agent* ag, double x, double y) const
         }
     }
     return false;
-    
+}
+
+void StudentWorld::useExit(Exit* exit)
+{
+    pene->useExitIfAppropriate(exit);
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        (*it)->useExitIfAppropriate(exit);
+    }
+}
+
+bool StudentWorld::getPenelopeDist(double x, double y, double& p_x, double& p_y, double& dist_p)
+{
+    p_x=pene->getX();
+    p_y=pene->getY();
+    dist_p=computeDistance(x, y, p_x, p_y);
+    return dist_p<=6400;
+}
+
+void StudentWorld::triggerLandmineIfAppropriate(Landmine* landmine)
+{
+    landmine->activateIfAppropriate(pene);
+    for(list<Actor*>::iterator it=m_actors.begin();it!=m_actors.end();it++)
+    {
+        if(landmine->isAlive())
+        {
+            landmine->activateIfAppropriate(*it);
+        }
+        else break;
+    }
 }
 
 void StudentWorld::writeStatus()
@@ -380,21 +406,4 @@ void StudentWorld::writeStatus()
     oss<<"Infected: "<<pene->getInfectionCount();
     
     setGameStatText(oss.str());
-    
-}
-
-//##########################
-//MARK: - cleanUp
-//##########################
-
-void StudentWorld::cleanUp()
-{
-        for(std::list<Actor*>::iterator it=m_actors.begin();it != m_actors.end();it++)
-        {
-            delete *it;
-            (*it) = nullptr;
-        }
-        m_actors.erase(m_actors.begin(),m_actors.end());
-        delete pene;
-        pene=nullptr;
 }

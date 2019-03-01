@@ -34,60 +34,47 @@ public:
     // If this object can die by falling into a pit or burning, die.
     virtual void dieByFallOrBurnIfAppropriate(){}
     
-    // Does this object block agent movement?
+    // Return true if this object can block movement of Agent
     virtual bool blocksAgent() const
     { return false; }
     
+    // Return true if this object can be killed by Flame and Pit
     virtual bool canKillByFlameAndPit() const
     { return true; }
     
-    
+    // Return true if this object can be infected by Vomit
     virtual bool canInfectByVomit() const
-     { return false; }
+    { return false; }
     
-    virtual void setInfectionStatus(){}
-    
-    // Does this object block flames?
+    // Return true if this object can block flames?
     virtual bool blocksFlame() const
     { return false; }
     
+    virtual void setInfectionStatus(){}
     
-    
-    // Can this object cause a zombie to vomit?
-    // virtual bool triggersZombieVomit() const
-
-    
-    // Does this object trigger landmines only when they're active?
-    // virtual bool triggersOnlyActiveLandmines() const;
-    
+    // Return true if this object is a Zombie
     virtual bool isZombie()
     { return false; }
     
+    Direction getDirectionByNum(int n);
+    
     bool determineNewPosition(Direction dir, double& x, double& y, double distance);
     
-    //Check whether the new location is still in StudentWorld
+    //Check whether the new location with regard to the direction specified is still in StudentWorld
     //Returns false if x y coordinates are out of bound, with x,y remaining unchanged.
     //Returns true otherwise, and set x,y to new values
     bool getNewPositionWithDir(Direction dir, double& x, double& y);
-
-    Direction getDirectionByNum(int n);
-    
     
 private:
-    
     StudentWorld* m_world;
-    bool aliveStatus; //YES, aliveStatus should be valid for Pene / citizen / zombie, even pick-ups
+    bool aliveStatus;
 };
-
-
-
-
 
 class Wall: public Actor
 {
 public:
     Wall(StudentWorld* gw, double startX, double startY);
-    virtual void doSomething();
+    virtual void doSomething(){};
     virtual void setDead(){}
     
     bool blocksFlame(Actor* flame) const
@@ -104,8 +91,6 @@ public:
 // MARK: - Activating Objects
 //##########################
 
-
-
 class ActivatingObject: public Actor
 {
 public:
@@ -116,16 +101,13 @@ class Exit: public ActivatingObject
 {
 public:
     Exit(StudentWorld* gw, double startX, double startY);
-    
-    //Checks whether there are Human Overlapping the Exit itself
     void doSomething();
+    
     bool blocksFlame(Actor* flame) const
     { return true; }
     
     virtual bool canKillByFlameAndPit() const
     { return false; }
-    
-    
 };
 
 class Pit: public ActivatingObject
@@ -136,7 +118,6 @@ public:
     void activateIfAppropriate(Actor* a);
     virtual bool canKillByFlameAndPit() const
     { return false; }
-    
 };
 
 class Flame: public ActivatingObject
@@ -145,10 +126,13 @@ public:
     Flame(StudentWorld* gw, double startX, double startY, Direction dir);
     void doSomething();
     void activateIfAppropriate(Actor* a);
+    
     int getCount()
     { return active_count; }
+    
     void decCount()
     { active_count--; }
+    
     virtual bool canKillByFlameAndPit() const
     { return false; }
     
@@ -160,26 +144,23 @@ class Vomit: public ActivatingObject
 {
 public:
     Vomit(StudentWorld* gw, double startX, double startY, Direction dir);
-   
     void doSomething();
     void activateIfAppropriate(Actor* a);
+    
     int getCount()
     { return active_count; }
+    
     void decCount()
     { active_count--; }
     
-    void infectByVomitIfAppropriate(Actor* a);
-    
 private:
     int active_count;
-    
 };
 
 class Landmine: public ActivatingObject
 {
 public:
     Landmine(StudentWorld* gw, double startX, double startY);
-    
     void doSomething();
     virtual void activateIfAppropriate(Actor* a);
     virtual void dieByFallOrBurnIfAppropriate(); //Can call explode()
@@ -204,38 +185,31 @@ class Goodie: public ActivatingObject
 {
 public:
     Goodie(StudentWorld* gw, int imageID, double startX, double startY);
-    
     virtual void doSomething();
     virtual void activateIfAppropriate(Actor* a);
-    // virtual void dieByFallOrBurnIfAppropriate();
     virtual void pickUp(Penelope* p);
-    void dieByFallOrBurnIfAppropriate();
-    
+    void dieByFallOrBurnIfAppropriate()
+    { setDead(); }
 };
 
 class VaccineGoodie: public Goodie
 {
 public:
     VaccineGoodie(StudentWorld* gw, double startX, double startY);
-    
     void pickUp(Penelope* p);
-    
 };
 
 class GasCanGoodie: public Goodie
 {
 public:
     GasCanGoodie(StudentWorld* gw, double startX, double startY);
-   
     void pickUp(Penelope* p);
-    
 };
 
 class LandmineGoodie: public Goodie
 {
 public:
     LandmineGoodie(StudentWorld* gw, double startX, double startY);
-    
     void pickUp(Penelope* p);
 };
 
@@ -248,12 +222,8 @@ class Agent: public Actor
 {
 public:
     Agent(StudentWorld* gw, int imageID, double startX, double startY);
-    
-    
     virtual bool blocksAgent() const
     { return true; }
-    
-    
 };
 
 //*************
@@ -262,12 +232,14 @@ class Human: public Agent
 {
 public:
     Human(StudentWorld* gw, int imageID, double startX, double startY);
-    
     virtual void doSomething();
+    
     bool getInfectedStatus() const
     { return infectedStatus; }
+    
     int getInfectionCount() const
     { return infectionCount; }
+    
     void setInfectionStatus()
     { infectedStatus=true; }
     
@@ -277,14 +249,12 @@ public:
         infectedStatus=false;
     }
     
-    virtual void useExitIfAppropriate(Exit* exit);
     virtual bool canInfectByVomit() const
     { return true; }
     
 private:
     int infectionCount;
     bool infectedStatus;
-    
 };
 
 
@@ -293,13 +263,10 @@ class Penelope: public Human
 {
 public:
     Penelope(StudentWorld* gw, double startX, double startY);
-    
     virtual void doSomething();
-    void moveToPosition(double x, double y, Direction dir);
     
-    virtual void dieByFallOrBurnIfAppropriate();
-    
-   
+    virtual void dieByFallOrBurnIfAppropriate()
+    { setDead(); }
     
     // Increase the number of vaccines the object has.
     void increaseVaccines()
@@ -325,51 +292,38 @@ public:
     int getNumLandmines() const
     { return mine_count; }
     
-    
-    void fireGasCan();
-    
-    void useLandmine();
-    
+    void moveToPosition(double x, double y, Direction dir);
     void useVaccine();
-    
+    void fireGasCan();
+    void useLandmine();
     void useExitIfAppropriate(Exit* exit);
-    
-    
-    
+
 private:
     int flame_count;
     int mine_count;
     int vaccine_count;
-    
 };
-
-
 
 class Citizen: public Human
 {
 public:
     Citizen(StudentWorld* gw, double startX, double startY);
     virtual void doSomething();
+    virtual void clearInfection(){}
     void useExitIfAppropriate(Exit* exit);
     virtual void dieByFallOrBurnIfAppropriate();
-    virtual void clearInfection(){}
-    
-    virtual void turnIntoZombie();
-    
     virtual bool moveToPenelope(double p_x, double p_y);
-    
     bool moveAwayFromZombie(double zombie_x, double zombie_y, double dist_z);
     
     //Returns true if Citizen is on the same row/col as Penelope
     bool pickDirection(double x, double y, double target_x, double target_y,std::vector<int>& direction_pool);
     
+    //Returns true if Move is successful
     bool pickEscapeDirection(double x, double y, double OtherX, double OtherY,std::vector<int>& direction_pool, std::vector<double>& dist_pool, double current_dist_z);
     
-    
-    
-
+    //Create a new Zombie at the same location as Citizen
+    virtual void turnIntoZombie();
 };
-
 
 //*************
 // MARK: Zombie
@@ -378,14 +332,15 @@ class Zombie: public Agent
 {
 public:
     Zombie(StudentWorld* gw, double startX, double startY);
-    
+    virtual void doSomething();
     virtual void computeVomitPosition(double& x,double& y);
     virtual bool vomitIfAppropriate(const double& x, const double& y);
-    virtual void doSomething();
+    virtual void moveToNewPosition();
+    virtual void dieByFallOrBurnIfAppropriate();
+    virtual void setNewDirection();
+    
     virtual bool isZombie()
     { return true; }
-    
-    virtual void moveToNewPosition();
     
     int getMoves()
     { return moves; }
@@ -399,11 +354,6 @@ public:
     virtual void setNewMoves()
     { moves=randInt(3,10); }
     
-    virtual void setNewDirection();
-    
-    virtual void dieByFallOrBurnIfAppropriate();
-    
-    
 private:
     int moves;
 };
@@ -412,26 +362,16 @@ class DumbZombie: public Zombie
 {
 public:
     DumbZombie(StudentWorld* gw, double startX, double startY);
-    //void doSomething();
     virtual void dieByFallOrBurnIfAppropriate();
-    void dropVaccineByChance(const double x, const double y);
-    
 };
 
 class SmartZombie: public Zombie
 {
 public:
     SmartZombie(StudentWorld* gw, double startX, double startY);
-    //void doSomething();
-    
     virtual void dieByFallOrBurnIfAppropriate();
-    
     virtual void setNewDirection();
-    
     Direction pickDirection(double x, double y, double target_x, double target_y);
-    
 };
-
-
 
 #endif // ACTOR_H
