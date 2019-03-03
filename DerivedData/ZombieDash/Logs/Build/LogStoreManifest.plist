@@ -6,7 +6,7 @@
 	<integer>9</integer>
 	<key>logs</key>
 	<dict>
-		<key>BB688855-CCF5-4D35-A428-1504D43A4F80</key>
+		<key>AD12CB98-9CF3-493D-BAC0-E19F72D21FE4</key>
 		<dict>
 			<key>className</key>
 			<string>IDEActivityLogSection</string>
@@ -15,7 +15,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>BB688855-CCF5-4D35-A428-1504D43A4F80.xcactivitylog</string>
+			<string>AD12CB98-9CF3-493D-BAC0-E19F72D21FE4.xcactivitylog</string>
 			<key>highLevelStatus</key>
 			<string>W</string>
 			<key>schemeIdentifier-containerName</key>
@@ -27,15 +27,15 @@
 			<key>signature</key>
 			<string>Build ZombieDash</string>
 			<key>timeStartedRecording</key>
-			<real>573114497.33321404</real>
+			<real>573294676.89072299</real>
 			<key>timeStoppedRecording</key>
-			<real>573114500.79200995</real>
+			<real>573294680.63851905</real>
 			<key>title</key>
 			<string>Build ZombieDash</string>
 			<key>uniqueIdentifier</key>
-			<string>BB688855-CCF5-4D35-A428-1504D43A4F80</string>
+			<string>AD12CB98-9CF3-493D-BAC0-E19F72D21FE4</string>
 		</dict>
-		<key>FE9E921A-383B-47BB-A9A9-89B0F546A700</key>
+		<key>FAE5BD96-54F1-41EB-B1B3-95C4A6A77A8D</key>
 		<dict>
 			<key>className</key>
 			<string>IDEActivityLogSection</string>
@@ -44,7 +44,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>FE9E921A-383B-47BB-A9A9-89B0F546A700.xcactivitylog</string>
+			<string>FAE5BD96-54F1-41EB-B1B3-95C4A6A77A8D.xcactivitylog</string>
 			<key>highLevelStatus</key>
 			<string>W</string>
 			<key>schemeIdentifier-containerName</key>
@@ -54,15 +54,15 @@
 			<key>schemeIdentifier-sharedScheme</key>
 			<integer>1</integer>
 			<key>signature</key>
-			<string>Build ZombieDash</string>
+			<string>Archive ZombieDash</string>
 			<key>timeStartedRecording</key>
-			<real>573100171.67941701</real>
+			<real>573183036.94450295</real>
 			<key>timeStoppedRecording</key>
-			<real>573100171.75375104</real>
+			<real>573183041.39191997</real>
 			<key>title</key>
-			<string>Build ZombieDash</string>
+			<string>Archive ZombieDash</string>
 			<key>uniqueIdentifier</key>
-			<string>FE9E921A-383B-47BB-A9A9-89B0F546A700</string>
+			<string>FAE5BD96-54F1-41EB-B1B3-95C4A6A77A8D</string>
 		</dict>
 	</dict>
 </dict>

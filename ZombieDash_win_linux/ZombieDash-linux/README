@@ -1,0 +1,13 @@
+This is how to build Zombie Dash, assuming you've
+already installed freeGLUT:
+
+1.Install freeglut
+
+Ubuntu: sudo apt-get install freeglut3 freeglut3-dev
+Fedora: sudo yum install freeglut freeglut-devel
+
+2. To build the program, change your directory into the ZombieDash directory and type
+	make
+
+3. To run the program, type
+	./ZombieDash

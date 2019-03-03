@@ -6,7 +6,7 @@
 	<integer>9</integer>
 	<key>logs</key>
 	<dict>
-		<key>6A91B98D-CB5E-49FF-B853-5DCE7B3EE7A0</key>
+		<key>263C8ED9-6253-4041-BC83-867AD851BFDE</key>
 		<dict>
 			<key>className</key>
 			<string>DBGConsoleLog</string>
@@ -15,7 +15,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
 			<key>fileName</key>
-			<string>6A91B98D-CB5E-49FF-B853-5DCE7B3EE7A0.xcactivitylog</string>
+			<string>263C8ED9-6253-4041-BC83-867AD851BFDE.xcactivitylog</string>
 			<key>highLevelStatus</key>
 			<string>S</string>
 			<key>schemeIdentifier-containerName</key>
@@ -27,15 +27,15 @@
 			<key>signature</key>
 			<string>Debug ZombieDash</string>
 			<key>timeStartedRecording</key>
-			<real>573114500.66811299</real>
+			<real>573294680.48878396</real>
 			<key>timeStoppedRecording</key>
-			<real>573114524.41697598</real>
+			<real>573294727.45968795</real>
 			<key>title</key>
 			<string>Debug ZombieDash</string>
 			<key>uniqueIdentifier</key>
-			<string>6A91B98D-CB5E-49FF-B853-5DCE7B3EE7A0</string>
+			<string>263C8ED9-6253-4041-BC83-867AD851BFDE</string>
 		</dict>
-		<key>E98F2AE2-7258-4C63-BD6B-F413941CF61B</key>
+		<key>E203C127-D67C-4C6F-9254-C3E89EF2FBF6</key>
 		<dict>
 			<key>className</key>
 			<string>DBGConsoleLog</string>
@@ -44,7 +44,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.DebugLog</string>
 			<key>fileName</key>
-			<string>E98F2AE2-7258-4C63-BD6B-F413941CF61B.xcactivitylog</string>
+			<string>E203C127-D67C-4C6F-9254-C3E89EF2FBF6.xcactivitylog</string>
 			<key>highLevelStatus</key>
 			<string>S</string>
 			<key>schemeIdentifier-containerName</key>
@@ -56,13 +56,13 @@
 			<key>signature</key>
 			<string>Debug ZombieDash</string>
 			<key>timeStartedRecording</key>
-			<real>573100171.73019397</real>
+			<real>573182932.21700597</real>
 			<key>timeStoppedRecording</key>
-			<real>573100379.70118499</real>
+			<real>573182948.37205899</real>
 			<key>title</key>
 			<string>Debug ZombieDash</string>
 			<key>uniqueIdentifier</key>
-			<string>E98F2AE2-7258-4C63-BD6B-F413941CF61B</string>
+			<string>E203C127-D67C-4C6F-9254-C3E89EF2FBF6</string>
 		</dict>
 	</dict>
 </dict>
