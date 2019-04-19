@@ -10,6 +10,8 @@ In Zombie Dash, your human friends are trapped by zombies AGAIN!! Your glorious 
 
 You play the role of **Penelope**, a zombie hunter. You need to trek through an abandoned building, rescuing frightened citizens before they are turned into brainless **Zombies**. On each level, you must lead all of the **Citizens** safely to the **Exits**, then head through an exit yourself so you can advance to the next level.
 
+![GamePlay](https://github.com/Ahren09/ZombieDash.git/raw/master/Gameplay.jpg)
+
 **Zombies** are blue. Some are **Dumb Zombies** and just wander around randomly, while others are **Smart Zombies** and will attempt to move toward you or **Citizens** if they get too close. 
 
 Do not let the **Citizens** or yourself get too close to **Zombies**.
